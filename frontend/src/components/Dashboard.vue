@@ -47,6 +47,7 @@
             :event="event"
             class="animate-in"
             :style="{ animationDelay: `${index * 0.1}s` }"
+            @edit="openQuickEditor"
           />
         </div>
 
@@ -65,6 +66,13 @@
       @close="isEditorOpen = false"
       @saved="fetchDashboardData"
     />
+
+    <EventQuickEditor
+      :isOpen="isQuickEditorOpen"
+      :event="quickEditEvent"
+      @close="closeQuickEditor"
+      @saved="fetchDashboardData"
+    />
   </div>
 </template>
 
@@ -74,12 +82,15 @@ import { getEvents, getCalendarMarks } from '../api';
 import EventCard from './EventCard.vue';
 import Calendar from './Calendar.vue';
 import EventEditor from './EventEditor.vue';
+import EventQuickEditor from './EventQuickEditor.vue';
 import { Settings as SettingsIcon } from 'lucide-vue-next';
 
 const events = ref([]);
 const calendarMarks = ref([]);
 const loading = ref(true);
 const isEditorOpen = ref(false);
+const isQuickEditorOpen = ref(false);
+const quickEditEvent = ref(null);
 const keyword = ref('');
 const activeCategory = ref('all');
 
@@ -145,6 +156,16 @@ const fetchDashboardData = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const openQuickEditor = (event) => {
+  quickEditEvent.value = event;
+  isQuickEditorOpen.value = true;
+};
+
+const closeQuickEditor = () => {
+  isQuickEditorOpen.value = false;
+  quickEditEvent.value = null;
 };
 
 onMounted(() => {

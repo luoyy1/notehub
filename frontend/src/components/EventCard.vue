@@ -12,7 +12,10 @@
           <span v-if="event.mood">{{ event.mood }}</span>
         </div>
       </div>
-      <span class="event-date">{{ event.date }}</span>
+      <div class="card-actions">
+        <span class="event-date">{{ event.date }}</span>
+        <button class="edit-btn" type="button" @click="$emit('edit', event)">编辑</button>
+      </div>
     </div>
 
     <p v-if="event.story" class="story">{{ event.story }}</p>
@@ -64,6 +67,8 @@ const props = defineProps({
     required: true
   }
 });
+
+defineEmits(['edit']);
 
 const categoryMap = {
   anniversary: '纪念日',
@@ -133,6 +138,29 @@ const cardStyle = computed(() => ({
   color: #888;
   font-family: monospace;
   white-space: nowrap;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.edit-btn {
+  border: 1px solid rgba(236, 72, 153, 0.16);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--event-color);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.edit-btn:hover {
+  background: color-mix(in srgb, var(--event-color) 10%, white);
 }
 
 .meta-row,
@@ -254,5 +282,18 @@ const cardStyle = computed(() => ({
   color: #999;
   font-style: italic;
   font-size: 0.9rem;
+}
+
+@media (max-width: 520px) {
+  .card-header {
+    flex-direction: column;
+  }
+
+  .card-actions {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 </style>

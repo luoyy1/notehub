@@ -52,10 +52,7 @@ export const getWishes = () => {
 };
 
 export const saveWishes = (wishes) => {
-  return api.post('/wishes', wishes).then(res => res.data).catch(() => {
-    console.warn("Backend not reachable, mocked saving wishes");
-    return wishes;
-  });
+  return api.post('/wishes', wishes).then(res => res.data);
 };
 
 export const getRawEvents = () => {
@@ -70,10 +67,7 @@ export const getRawEvents = () => {
 };
 
 export const saveEvents = (events) => {
-  return api.post('/events', events).then(res => res.data).catch(() => {
-    console.warn("Backend not reachable, mocked saving");
-    return events;
-  });
+  return api.post('/events', events).then(res => res.data);
 };
 
 export const getCalendarMarks = (year) => {
