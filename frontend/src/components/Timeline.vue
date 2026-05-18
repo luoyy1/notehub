@@ -2,31 +2,69 @@
   <main class="timeline-page">
     <section class="timeline-hero">
       <p class="eyebrow">时间轴</p>
-      <h1>以今天为中心的时间线</h1>
-      <p class="intro">过去收成左侧的年份刻度，未来展开在右侧。今天不是列表中的一项，而是整条时间线的锚点。</p>
+      <h1>以今天为中心的事件视图</h1>
+      <p class="intro">只展示事件中心勾选加入时间轴的事件，适合快速筛选、定位和维护。</p>
     </section>
 
     <section v-if="loading" class="loading-state">
       <div class="loader"></div>
-      <p>正在整理时间线...</p>
+      <p>正在整理时间轴...</p>
     </section>
 
     <section v-else class="timeline-shell">
       <div class="timeline-toolbar">
         <div>
           <span class="mode-title">今天 · {{ todayLabel }}</span>
-          <span class="mode-subtitle">左侧压缩过去，右侧展开即将到来的日子</span>
+          <span class="mode-subtitle">{{ filteredTimelineEvents.length }} 个匹配事件，{{ pastItems.length }} 个过去节点，{{ futureItems.length }} 个未来提醒</span>
         </div>
-        <div class="summary">
-          <span>{{ timelineEvents.length }} 个时间轴事件</span>
-          <span>{{ pastItems.length }} 个过去节点</span>
-          <span>{{ futureItems.length }} 个未来提醒</span>
+        <div class="toolbar-actions">
+          <button class="soft-btn" type="button" @click="centerToday">回到今天</button>
+          <button class="soft-btn" type="button" @click="fitAll">适配全部</button>
         </div>
+      </div>
+
+      <div class="filters-panel">
+        <input v-model="keyword" class="search-input" type="search" placeholder="搜索名称、故事、地点、心情、标签" />
+        <select v-model="activeCategory" class="filter-select">
+          <option value="all">全部分类</option>
+          <option v-for="category in categoryOptions" :key="category.value" :value="category.value">
+            {{ category.label }}
+          </option>
+        </select>
+        <select v-model="activeTag" class="filter-select">
+          <option value="all">全部标签</option>
+          <option v-for="tag in tagOptions" :key="tag" :value="tag">{{ tag }}</option>
+        </select>
+      </div>
+
+      <div class="segmented-row">
+        <button
+          v-for="option in directionOptions"
+          :key="option.value"
+          class="segment-btn"
+          :class="{ active: directionFilter === option.value }"
+          type="button"
+          @click="directionFilter = option.value"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+
+      <div class="state-filters">
+        <label v-for="option in stateOptions" :key="option.value" class="switch-pill">
+          <input v-model="stateFilters" type="checkbox" :value="option.value" />
+          <span>{{ option.label }}</span>
+        </label>
       </div>
 
       <div v-if="timelineEvents.length === 0" class="timeline-empty">
         <strong>时间轴还没有事件</strong>
         <span>回到首页事件中心，把需要展示的事件打开“加入时间轴”。</span>
+      </div>
+
+      <div v-else-if="filteredTimelineEvents.length === 0" class="timeline-empty">
+        <strong>没有匹配的时间轴事件</strong>
+        <span>调整搜索、分类、标签或状态筛选后再试。</span>
       </div>
 
       <div
@@ -41,102 +79,51 @@
         @pointerleave="stopDrag"
         @wheel.prevent="wheelTimeline"
       >
-        <div class="centered-timeline" :style="{ minHeight: timelineHeight }">
-          <section class="past-panel">
-            <div class="panel-title">已经过去</div>
-            <div class="past-ruler">
-              <div
-                v-for="year in pastYears"
-                :key="year"
-                class="year-tick"
-                :class="{ current: year === today.getFullYear() }"
-              >
-                <span class="year-line"></span>
-                <span class="year-label">{{ year }}</span>
+        <div class="scale-strip" :style="{ width: timelineWidthStyle }">
+          <div class="scale-line"></div>
+          <span class="range-label start">{{ rangeStartLabel }}</span>
+          <span class="range-label today" :style="{ left: todayLeft }">今天</span>
+          <span class="range-label end">{{ rangeEndLabel }}</span>
+          <div
+            v-for="tick in timelineTicks"
+            :key="tick.key"
+            class="scale-tick"
+            :class="{ major: tick.major }"
+            :style="{ left: tick.left }"
+          >
+            <span></span>
+            <em>{{ tick.label }}</em>
+          </div>
+
+          <article
+            v-for="item in axisItems"
+            :key="item.key"
+            class="timeline-event"
+            :class="item.kind"
+            :style="getItemStyle(item)"
+            @click="openQuickEditor(item)"
+          >
+            <span class="event-pin"></span>
+            <button class="event-summary" type="button" @click.stop="openQuickEditor(item)">
+              <span class="event-date">{{ item.displayDate }}</span>
+              <strong>{{ item.name }}</strong>
+              <span class="event-note">{{ item.summary }}</span>
+              <div class="event-meta">
+                <em>{{ categoryLabel(item.category) }}</em>
+                <em v-if="item.metric">{{ item.metric }}</em>
               </div>
-
-              <article
-                v-for="item in pastItems"
-                :key="item.key"
-                class="past-event"
-                :style="getPastStyle(item)"
-              >
-                <span class="past-pin"></span>
-                <div class="past-card">
-                  <strong>{{ item.name }}</strong>
-                  <span>{{ item.year }} · {{ item.monthDay }}</span>
-                  <small>{{ item.note }}</small>
-                  <p v-if="item.story">{{ item.story }}</p>
-                  <div v-if="item.tags?.length" class="timeline-tags">
-                    <em v-for="tag in item.tags" :key="tag"># {{ tag }}</em>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          <section class="today-anchor">
-            <div class="today-card">
-              <span class="today-kicker">TODAY</span>
-              <strong>{{ todayLabel }}</strong>
-              <span>{{ weekdayLabel }}</span>
-            </div>
-            <span class="today-line"></span>
-          </section>
-
-          <section class="future-panel">
-            <div class="panel-title">即将发生</div>
-            <div class="future-ruler">
-              <div
-                v-for="tick in futureTicks"
-                :key="tick.key"
-                class="future-tick"
-                :class="{ major: tick.major }"
-                :style="{ left: tick.left }"
-              >
-                <span class="future-line"></span>
-                <span class="future-label">{{ tick.label }}</span>
-              </div>
-
-              <article
-                v-for="(item, index) in futureItems"
-                :key="item.key"
-                class="future-event"
-                :style="getFutureStyle(item)"
-              >
-                <span class="future-pin"></span>
-                <div class="future-card">
-                  <span class="date">{{ item.targetLabel }}</span>
-                  <h2>{{ item.name }}</h2>
-                  <p>{{ item.note }}</p>
-                  <p v-if="item.story" class="story-note">{{ item.story }}</p>
-                  <div class="place-row" v-if="item.location || item.mood">
-                    <span v-if="item.location">{{ item.location }}</span>
-                    <span v-if="item.mood">{{ item.mood }}</span>
-                  </div>
-                  <div class="metric-row" v-if="item.metrics.length">
-                    <span v-for="metric in item.metrics" :key="metric">{{ metric }}</span>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
+            </button>
+          </article>
         </div>
       </div>
 
-      <div v-if="timelineEvents.length > 0" class="compact-timeline">
+      <div v-if="filteredTimelineEvents.length > 0" class="compact-timeline">
         <section class="compact-section">
-          <div class="compact-section-title">已经过去</div>
-          <article v-for="item in pastItems" :key="item.key" class="compact-card past">
-            <span class="compact-dot"></span>
-            <div>
-              <strong>{{ item.name }}</strong>
-              <span>{{ item.year }} · {{ item.monthDay }}</span>
-              <p>{{ item.note }}</p>
-              <div v-if="item.tags?.length" class="timeline-tags">
-                <em v-for="tag in item.tags" :key="tag"># {{ tag }}</em>
-              </div>
-            </div>
+          <div class="compact-section-title">过去</div>
+          <article v-for="item in pastItems" :key="item.key" class="compact-card" @click="openQuickEditor(item)">
+            <strong>{{ item.name }}</strong>
+            <span>{{ item.displayDate }} · {{ item.metric }}</span>
+            <p>{{ item.summary }}</p>
           </article>
         </section>
 
@@ -147,28 +134,29 @@
         </section>
 
         <section class="compact-section">
-          <div class="compact-section-title">即将发生</div>
-          <article v-for="item in futureItems" :key="item.key" class="compact-card future">
-            <span class="compact-dot"></span>
-            <div>
-              <span>{{ item.targetLabel }}</span>
-              <strong>{{ item.name }}</strong>
-              <p>{{ item.note }}</p>
-              <p v-if="item.story" class="story-note">{{ item.story }}</p>
-              <div class="metric-row" v-if="item.metrics.length">
-                <span v-for="metric in item.metrics" :key="metric">{{ metric }}</span>
-              </div>
-            </div>
+          <div class="compact-section-title">未来</div>
+          <article v-for="item in futureItems" :key="item.key" class="compact-card" @click="openQuickEditor(item)">
+            <strong>{{ item.name }}</strong>
+            <span>{{ item.displayDate }} · {{ item.metric }}</span>
+            <p>{{ item.summary }}</p>
           </article>
         </section>
       </div>
     </section>
+
+    <EventQuickEditor
+      :isOpen="isQuickEditorOpen"
+      :event="quickEditEvent"
+      @close="closeQuickEditor"
+      @saved="fetchTimelineData"
+    />
   </main>
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { getEvents } from '../api';
+import EventQuickEditor from './EventQuickEditor.vue';
 
 const events = ref([]);
 const loading = ref(true);
@@ -176,8 +164,43 @@ const timelineViewportRef = ref(null);
 const dragging = ref(false);
 const startX = ref(0);
 const startScrollLeft = ref(0);
+const keyword = ref('');
+const activeCategory = ref('all');
+const activeTag = ref('all');
+const directionFilter = ref('all');
+const stateFilters = ref([]);
+const isQuickEditorOpen = ref(false);
+const quickEditEvent = ref(null);
 const today = new Date();
 today.setHours(0, 0, 0, 0);
+
+const laneGap = 118;
+const axisBaseTop = 220;
+const timelineWidth = 1680;
+const laneCount = 4;
+const dayMs = 86400000;
+
+const categoryLabels = {
+  anniversary: '纪念日',
+  birthday: '生日',
+  travel: '旅行',
+  life: '生活',
+  work: '工作',
+  other: '其他'
+};
+
+const directionOptions = [
+  { label: '全部', value: 'all' },
+  { label: '过去', value: 'past' },
+  { label: '未来', value: 'future' }
+];
+
+const stateOptions = [
+  { label: '置顶', value: 'pinned' },
+  { label: '正计时', value: 'countUp' },
+  { label: '倒计时', value: 'countdown' },
+  { label: '每年重复', value: 'annual' }
+];
 
 const addDays = (date, days) => {
   const next = new Date(date);
@@ -194,164 +217,193 @@ const parseDate = (dateText) => {
 
 const formatMonthDay = (date) => `${date.getMonth() + 1}月${date.getDate()}日`;
 const formatFullDate = (date) => `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+const formatShortDate = (date) => `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
 
 const todayLabel = computed(() => formatFullDate(today));
 const weekdayLabel = computed(() => today.toLocaleDateString('zh-CN', { weekday: 'long' }));
-const laneGap = 132;
-const rulerTop = 292;
+const timelineWidthStyle = computed(() => `${timelineWidth}px`);
 
 const timelineEvents = computed(() => {
   return events.value.filter(event => Boolean(event.showInTimeline ?? event.show_in_timeline));
+});
+
+const categoryOptions = computed(() => {
+  const values = new Set(timelineEvents.value.map(event => event.category || 'other'));
+  return Array.from(values).map(value => ({
+    value,
+    label: categoryLabel(value)
+  }));
+});
+
+const tagOptions = computed(() => {
+  return Array.from(new Set(timelineEvents.value.flatMap(event => event.tags || []))).sort();
 });
 
 const normalizedItems = computed(() => {
   return timelineEvents.value.map((event) => {
     const originDate = parseDate(event.date);
     const daysUntil = Number(event.daysUntil);
-    const hasFuture = event.enableCountdown && Number.isFinite(daysUntil) && daysUntil >= 0;
+    const hasFuture = Boolean(event.enableCountdown) && Number.isFinite(daysUntil) && daysUntil >= 0;
     const targetDate = hasFuture ? addDays(today, daysUntil) : originDate;
-    const metrics = [];
-
-    if (event.enableCountUp && Number.isFinite(Number(event.daysPassed))) {
-      metrics.push(`已过 ${event.daysPassed} 天`);
-    }
-
-    if (hasFuture) {
-      metrics.push(daysUntil === 0 ? '今天' : `${daysUntil} 天后`);
-    }
-
-    if (event.daysToNextHundred) {
-      metrics.push(`百日差 ${event.daysToNextHundred} 天`);
-    }
+    const isPast = Boolean(event.enableCountUp) && originDate && originDate < today;
+    const isFuture = hasFuture && targetDate && targetDate >= today;
 
     return {
       ...event,
       key: event.id || `${event.name}-${event.date}`,
       originDate,
       targetDate,
-      year: originDate?.getFullYear() || '----',
-      monthDay: originDate ? formatMonthDay(originDate) : event.date,
-      targetLabel: targetDate ? formatFullDate(targetDate) : event.date,
-      metrics
+      isPast,
+      isFuture,
+      searchableText: [
+        event.name,
+        event.story,
+        event.location,
+        event.mood,
+        ...(event.tags || [])
+      ].filter(Boolean).join(' ').toLowerCase()
     };
   });
 });
 
-const pastItems = computed(() => {
+const filteredTimelineEvents = computed(() => {
+  const text = keyword.value.trim().toLowerCase();
+  const states = new Set(stateFilters.value);
+
   return normalizedItems.value
-    .filter(item => item.originDate && item.originDate < today && item.enableCountUp)
-    .map(item => ({
-      ...item,
-      note: item.story || (item.daysPassed ? `已经过去 ${item.daysPassed} 天` : '已经归入过去的年份里')
-    }))
+    .filter(item => !text || item.searchableText.includes(text))
+    .filter(item => activeCategory.value === 'all' || (item.category || 'other') === activeCategory.value)
+    .filter(item => activeTag.value === 'all' || (item.tags || []).includes(activeTag.value))
+    .filter(item => directionFilter.value === 'all' || (directionFilter.value === 'past' ? item.isPast : item.isFuture))
+    .filter(item => !states.has('pinned') || item.pinned)
+    .filter(item => !states.has('countUp') || item.enableCountUp)
+    .filter(item => !states.has('countdown') || item.enableCountdown)
+    .filter(item => !states.has('annual') || item.isAnnual);
+});
+
+const pastItems = computed(() => {
+  return filteredTimelineEvents.value
+    .filter(item => item.isPast)
     .sort((a, b) => a.originDate - b.originDate)
-    .map((item, index) => ({
-      ...item,
-      lane: index % 4
-    }));
+    .map((item, index) => toAxisItem(item, index, 'past'));
 });
 
 const futureItems = computed(() => {
-  return normalizedItems.value
-    .filter(item => item.targetDate && item.targetDate >= today && item.enableCountdown)
-    .map(item => ({
-      ...item,
-      note: Number(item.daysUntil) === 0 ? '今天就是这个日子。' : `距离到来还有 ${item.daysUntil} 天。`
-    }))
+  return filteredTimelineEvents.value
+    .filter(item => item.isFuture)
     .sort((a, b) => a.targetDate - b.targetDate)
-    .map((item, index) => ({
-      ...item,
-      lane: index % 4
-    }));
+    .map((item, index) => toAxisItem(item, index, 'future'));
 });
 
-const maxLane = computed(() => {
-  const lanes = [...pastItems.value, ...futureItems.value].map(item => item.lane || 0);
-  return lanes.length ? Math.max(...lanes) : 0;
+const axisItems = computed(() => [...pastItems.value, ...futureItems.value]);
+
+const rangeStart = computed(() => {
+  const dates = axisItems.value.map(item => item.axisDate).filter(Boolean);
+  if (!dates.length) return addDays(today, -180);
+  const earliest = new Date(Math.min(...dates.map(date => date.getTime())));
+  return addDays(earliest < today ? earliest : today, -30);
 });
 
-const timelineHeight = computed(() => `${Math.max(620, 450 + maxLane.value * laneGap)}px`);
-
-const minPastYear = computed(() => {
-  const years = pastItems.value.map(item => item.originDate.getFullYear());
-  return years.length ? Math.min(...years) : today.getFullYear() - 1;
+const rangeEnd = computed(() => {
+  const dates = axisItems.value.map(item => item.axisDate).filter(Boolean);
+  if (!dates.length) return addDays(today, 365);
+  const latest = new Date(Math.max(...dates.map(date => date.getTime())));
+  return addDays(latest > today ? latest : today, 30);
 });
 
-const pastYears = computed(() => {
-  const years = [];
-  for (let year = minPastYear.value; year <= today.getFullYear(); year += 1) {
-    years.push(year);
-  }
-  return years;
-});
+const rangeDays = computed(() => Math.max(30, Math.ceil((rangeEnd.value - rangeStart.value) / dayMs)));
+const todayLeft = computed(() => `${dateToPercent(today)}%`);
+const rangeStartLabel = computed(() => formatShortDate(rangeStart.value));
+const rangeEndLabel = computed(() => formatShortDate(rangeEnd.value));
 
-const futureEndDate = computed(() => {
-  const latest = futureItems.value.at(-1)?.targetDate;
-  const fallback = addDays(today, 365);
-  return latest && latest > fallback ? latest : fallback;
-});
-
-const futureDays = computed(() => {
-  return Math.max(30, Math.ceil((futureEndDate.value - today) / 86400000));
-});
-
-const futureTicks = computed(() => {
+const timelineTicks = computed(() => {
   const ticks = [];
-  const cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+  const cursor = new Date(rangeStart.value.getFullYear(), rangeStart.value.getMonth(), 1);
+  cursor.setMonth(cursor.getMonth() + 1);
 
-  while (cursor <= futureEndDate.value) {
-    const daysFromToday = Math.round((cursor - today) / 86400000);
-    if (daysFromToday >= 0) {
-      ticks.push({
-        key: `${cursor.getFullYear()}-${cursor.getMonth()}`,
-        label: cursor.getMonth() === 0 ? `${cursor.getFullYear()}` : `${cursor.getMonth() + 1}月`,
-        major: cursor.getMonth() === 0,
-        left: `${Math.min(100, (daysFromToday / futureDays.value) * 100)}%`
-      });
-    }
+  while (cursor < rangeEnd.value) {
+    ticks.push({
+      key: `${cursor.getFullYear()}-${cursor.getMonth()}`,
+      label: cursor.getMonth() === 0 ? `${cursor.getFullYear()}` : `${cursor.getMonth() + 1}月`,
+      major: cursor.getMonth() === 0,
+      left: `${dateToPercent(cursor)}%`
+    });
     cursor.setMonth(cursor.getMonth() + 1);
   }
 
   return ticks;
 });
 
-const getPastLeft = (item) => {
-  const yearSpan = Math.max(1, today.getFullYear() - minPastYear.value + 1);
-  const yearOffset = item.originDate.getFullYear() - minPastYear.value;
-  const monthOffset = item.originDate.getMonth() / 12;
-  return `${Math.min(80, Math.max(20, ((yearOffset + monthOffset) / yearSpan) * 100))}%`;
-};
+function categoryLabel(value) {
+  return categoryLabels[value || 'other'] || value || '其他';
+}
 
-const getFutureLeft = (item) => {
-  const days = Math.max(0, Math.round((item.targetDate - today) / 86400000));
-  return `${Math.min(82, Math.max(18, (days / futureDays.value) * 100))}%`;
-};
+function dateToPercent(date) {
+  return Math.min(100, Math.max(0, ((date - rangeStart.value) / dayMs / rangeDays.value) * 100));
+}
 
-const getPastStyle = (item) => ({
-  left: getPastLeft(item),
-  top: `${-220 - (item.lane || 0) * laneGap}px`,
-  '--lane-offset': `${(item.lane || 0) * laneGap}px`
-});
+function toAxisItem(item, index, kind) {
+  const axisDate = kind === 'past' ? item.originDate : item.targetDate;
+  const metric = kind === 'past'
+    ? `已过 ${item.daysPassed || Math.max(0, Math.round((today - item.originDate) / dayMs))} 天`
+    : (Number(item.daysUntil) === 0 ? '今天' : `${item.daysUntil} 天后`);
 
-const getFutureStyle = (item) => ({
-  left: getFutureLeft(item),
-  top: `${-226 - (item.lane || 0) * laneGap}px`,
-  '--lane-offset': `${(item.lane || 0) * laneGap}px`
+  return {
+    ...item,
+    kind,
+    lane: index % laneCount,
+    axisDate,
+    displayDate: axisDate ? formatShortDate(axisDate) : item.date,
+    metric,
+    summary: item.story || item.location || item.mood || categoryLabel(item.category)
+  };
+}
+
+const getItemStyle = (item) => ({
+  left: `${dateToPercent(item.axisDate)}%`,
+  top: `${axisBaseTop + item.lane * laneGap}px`
 });
 
 const centerToday = async () => {
   await nextTick();
   const viewport = timelineViewportRef.value;
   if (!viewport) return;
+  viewport.scrollLeft = Math.max(0, (timelineWidth * dateToPercent(today)) / 100 - viewport.clientWidth / 2);
+};
 
-  const todayOffset = 520 + 56;
-  viewport.scrollLeft = Math.max(0, todayOffset - viewport.clientWidth / 2);
+const fitAll = async () => {
+  await nextTick();
+  const viewport = timelineViewportRef.value;
+  if (!viewport) return;
+  viewport.scrollLeft = 0;
+};
+
+const fetchTimelineData = async () => {
+  loading.value = true;
+  try {
+    events.value = await getEvents();
+  } catch (error) {
+    console.error('Failed to load timeline:', error);
+  } finally {
+    loading.value = false;
+    centerToday();
+  }
+};
+
+const openQuickEditor = (item) => {
+  quickEditEvent.value = item;
+  isQuickEditorOpen.value = true;
+};
+
+const closeQuickEditor = () => {
+  isQuickEditorOpen.value = false;
+  quickEditEvent.value = null;
 };
 
 const startDrag = (event) => {
   const viewport = timelineViewportRef.value;
-  if (!viewport) return;
-
+  const target = event.target instanceof Element ? event.target : null;
+  if (!viewport || target?.closest('button')) return;
   dragging.value = true;
   startX.value = event.clientX;
   startScrollLeft.value = viewport.scrollLeft;
@@ -361,14 +413,12 @@ const startDrag = (event) => {
 const dragTimeline = (event) => {
   const viewport = timelineViewportRef.value;
   if (!dragging.value || !viewport) return;
-
   viewport.scrollLeft = startScrollLeft.value - (event.clientX - startX.value);
 };
 
 const stopDrag = (event) => {
   const viewport = timelineViewportRef.value;
   if (!dragging.value || !viewport) return;
-
   dragging.value = false;
   viewport.releasePointerCapture?.(event.pointerId);
 };
@@ -376,20 +426,14 @@ const stopDrag = (event) => {
 const wheelTimeline = (event) => {
   const viewport = timelineViewportRef.value;
   if (!viewport) return;
-
   viewport.scrollLeft += event.deltaY || event.deltaX;
 };
 
-onMounted(async () => {
-  try {
-    events.value = await getEvents();
-  } catch (error) {
-    console.error('Failed to load timeline:', error);
-  } finally {
-    loading.value = false;
-    centerToday();
-  }
+watch([filteredTimelineEvents, directionFilter, activeCategory, activeTag, stateFilters], () => {
+  centerToday();
 });
+
+onMounted(fetchTimelineData);
 </script>
 
 <style scoped>
@@ -400,7 +444,7 @@ onMounted(async () => {
 
 .timeline-hero {
   text-align: center;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 
 .eyebrow {
@@ -425,19 +469,138 @@ onMounted(async () => {
 }
 
 .timeline-shell {
-  border-radius: 26px;
-  padding: 24px;
+  border-radius: 24px;
+  padding: 22px;
   background: linear-gradient(180deg, rgba(255, 250, 248, 0.94), rgba(255, 255, 255, 0.98) 46%, #ffffff);
   border: 1px solid rgba(120, 98, 90, 0.1);
   box-shadow: 0 18px 48px rgba(112, 87, 74, 0.07);
 }
 
-.timeline-toolbar {
+.timeline-toolbar,
+.filters-panel,
+.segmented-row,
+.state-filters,
+.toolbar-actions,
+.event-meta {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.timeline-toolbar {
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
+}
+
+.mode-title,
+.mode-subtitle {
+  display: block;
+}
+
+.mode-title {
+  color: #383433;
+  font-size: 1.08rem;
+  font-weight: 850;
+}
+
+.mode-subtitle {
+  margin-top: 4px;
+  color: #817b76;
+  font-size: 0.9rem;
+}
+
+.soft-btn,
+.segment-btn,
+.filter-select,
+.search-input {
+  min-height: 40px;
+  border: 1px solid rgba(214, 199, 184, 0.74);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 246, 0.78));
+  color: #5f5753;
+  font: inherit;
+}
+
+.soft-btn,
+.segment-btn {
+  padding: 0 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.soft-btn:hover,
+.segment-btn.active {
+  color: #7c2d12;
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.88), rgba(204, 251, 241, 0.72));
+}
+
+.filters-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 160px 160px;
+  margin-bottom: 12px;
+}
+
+.search-input,
+.filter-select {
+  padding: 0 14px;
+  outline: none;
+}
+
+.segmented-row,
+.state-filters {
+  margin-bottom: 12px;
+}
+
+.switch-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid rgba(214, 199, 184, 0.74);
+  border-radius: 999px;
+  padding: 0 12px 0 40px;
+  color: #6f6663;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 246, 0.72));
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.switch-pill input {
+  position: absolute;
+  opacity: 0;
+}
+
+.switch-pill::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  width: 20px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.9), rgba(255, 250, 246, 0.82));
+  border: 1px solid rgba(148, 163, 184, 0.32);
+}
+
+.switch-pill::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(31, 41, 55, 0.16);
+  transition: transform 0.18s ease;
+}
+
+.switch-pill:has(input:checked) {
+  color: #7c2d12;
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.88), rgba(204, 251, 241, 0.72));
+}
+
+.switch-pill:has(input:checked)::after {
+  transform: translateX(8px);
 }
 
 .timeline-empty {
@@ -455,45 +618,10 @@ onMounted(async () => {
   font-size: 1.05rem;
 }
 
-.mode-title,
-.mode-subtitle {
-  display: block;
-}
-
-.mode-title {
-  color: #383433;
-  font-size: 1.08rem;
-  font-weight: 850;
-}
-
-.mode-subtitle,
-.summary {
-  color: #817b76;
-  font-size: 0.9rem;
-}
-
-.mode-subtitle {
-  margin-top: 4px;
-}
-
-.summary {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.summary span {
-  border: 1px solid rgba(126, 92, 82, 0.08);
-  border-radius: 999px;
-  padding: 7px 11px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(250, 244, 241, 0.55));
-}
-
 .timeline-viewport {
   overflow-x: auto;
-  overflow-y: visible;
-  border-radius: 24px;
+  overflow-y: hidden;
+  border-radius: 22px;
   cursor: grab;
   scrollbar-width: thin;
   scrollbar-color: rgba(160, 125, 116, 0.3) transparent;
@@ -516,334 +644,161 @@ onMounted(async () => {
   border-radius: 999px;
 }
 
-.centered-timeline {
-  display: grid;
-  grid-template-columns: 520px 112px 760px;
-  width: 1392px;
-  border-radius: 24px;
-  border: 1px solid rgba(123, 101, 92, 0.1);
-  overflow: visible;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 252, 249, 0.72) 58%, #ffffff),
-    repeating-linear-gradient(90deg, rgba(144, 121, 111, 0.04) 0, rgba(144, 121, 111, 0.04) 1px, transparent 1px, transparent 38px);
-}
-
-.past-panel,
-.future-panel {
+.scale-strip {
   position: relative;
-  padding: 26px 24px;
-  overflow: hidden;
+  height: 710px;
+  border: 1px solid rgba(123, 101, 92, 0.1);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 252, 249, 0.78) 58%, #ffffff),
+    repeating-linear-gradient(90deg, rgba(144, 121, 111, 0.04) 0, rgba(144, 121, 111, 0.04) 1px, transparent 1px, transparent 42px);
 }
 
-.past-panel {
-  background: linear-gradient(90deg, rgba(248, 242, 239, 0.58), rgba(255, 255, 255, 0.82));
+.scale-line {
+  position: absolute;
+  left: 42px;
+  right: 42px;
+  top: 188px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(173, 125, 136, 0), rgba(173, 125, 136, 0.28), rgba(128, 148, 134, 0));
 }
 
-.future-panel {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.86), rgba(248, 251, 247, 0.58));
-}
-
-.panel-title {
-  color: #807773;
-  font-size: 0.9rem;
+.range-label {
+  position: absolute;
+  top: 28px;
+  color: #8d8580;
+  font-size: 0.78rem;
   font-weight: 850;
 }
 
-.past-ruler,
-.future-ruler {
-  position: absolute;
-  left: 24px;
-  right: 24px;
-  top: 292px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(173, 125, 136, 0), rgba(173, 125, 136, 0.32), rgba(191, 162, 132, 0.22));
+.range-label.start {
+  left: 42px;
 }
 
-.future-ruler {
-  background: linear-gradient(90deg, rgba(191, 162, 132, 0.24), rgba(128, 148, 134, 0.32), rgba(128, 148, 134, 0));
+.range-label.end {
+  right: 42px;
 }
 
-.year-tick,
-.future-tick {
-  position: absolute;
-  top: -12px;
+.range-label.today {
+  top: 54px;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  color: #7c2d12;
 }
 
-.year-tick {
-  position: relative;
-  top: -12px;
-  transform: none;
-  display: inline-flex;
-  flex: 1 1 0;
+.scale-tick {
+  position: absolute;
+  top: 172px;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
 }
 
-.past-ruler {
-  display: flex;
-}
-
-.year-line,
-.future-line {
+.scale-tick span {
   width: 1px;
-  height: 22px;
-  background: rgba(130, 107, 99, 0.28);
+  height: 26px;
+  background: rgba(130, 107, 99, 0.24);
 }
 
-.year-label,
-.future-label {
-  margin-top: 8px;
+.scale-tick.major span {
+  height: 36px;
+  background: rgba(141, 98, 108, 0.38);
+}
+
+.scale-tick em {
   color: #8d8580;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
+  font-style: normal;
   white-space: nowrap;
 }
 
-.year-tick.current .year-line,
-.future-tick.major .future-line {
-  height: 32px;
-  background: rgba(141, 98, 108, 0.44);
-}
-
-.year-tick.current .year-label,
-.future-tick.major .future-label {
-  color: #74645f;
-  font-weight: 850;
-}
-
-.past-event,
-.future-event {
+.timeline-event {
   position: absolute;
+  width: 218px;
   transform: translateX(-50%);
-  z-index: 2;
 }
 
-.past-event {
-  width: 180px;
-}
-
-.past-pin,
-.future-pin {
+.event-pin {
   position: absolute;
   left: 50%;
-  border-radius: 50%;
-  background: #ffffff;
-  transform: translateX(-50%);
-}
-
-.past-pin {
-  top: calc(208px + var(--lane-offset, 0px));
+  top: -42px;
   width: 11px;
   height: 11px;
   border: 3px solid #c99aa5;
+  border-radius: 50%;
+  background: #ffffff;
   box-shadow: 0 0 0 7px rgba(201, 154, 165, 0.12);
+  transform: translateX(-50%);
 }
 
-.past-card,
-.future-card {
-  border-radius: 18px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 247, 0.78) 70%, #ffffff);
-  border: 1px solid rgba(112, 88, 82, 0.1);
-  box-shadow: 0 10px 30px rgba(116, 88, 80, 0.06);
-}
-
-.past-card,
-.future-card,
-.compact-card {
-  overflow-wrap: anywhere;
-}
-
-.past-card {
-  padding: 14px;
-}
-
-.past-card strong,
-.past-card span,
-.past-card small {
-  display: block;
-}
-
-.past-card strong {
-  color: #332f2f;
-  font-size: 0.96rem;
-}
-
-.past-card span {
-  margin-top: 6px;
-  color: #96746d;
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.past-card small {
-  margin-top: 8px;
-  color: #746f6b;
-  line-height: 1.5;
-}
-
-.past-card p,
-.story-note {
-  margin: 10px 0 0;
-  color: #6f6663;
-  line-height: 1.55;
-  font-size: 0.86rem;
-}
-
-.timeline-tags,
-.place-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.timeline-tags em,
-.place-row span {
-  color: #8b6c67;
-  background: rgba(248, 242, 239, 0.78);
-  border: 1px solid rgba(129, 104, 98, 0.08);
-  border-radius: 999px;
-  padding: 5px 8px;
-  font-size: 0.72rem;
-  font-style: normal;
-  font-weight: 750;
-}
-
-.today-anchor {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 247, 244, 0.78), #ffffff);
-  border-left: 1px solid rgba(126, 92, 82, 0.09);
-  border-right: 1px solid rgba(126, 92, 82, 0.09);
-}
-
-.today-line {
-  position: absolute;
-  top: 28px;
-  bottom: 28px;
-  width: 2px;
-  background: linear-gradient(180deg, rgba(151, 104, 113, 0), rgba(151, 104, 113, 0.42), rgba(151, 104, 113, 0));
-}
-
-.today-card {
-  position: relative;
-  z-index: 2;
-  width: 96px;
-  border-radius: 20px;
-  padding: 16px 10px;
-  text-align: center;
-  background: linear-gradient(180deg, #ffffff, rgba(250, 244, 241, 0.86));
-  border: 1px solid rgba(126, 92, 82, 0.12);
-  box-shadow: 0 14px 32px rgba(116, 88, 80, 0.08);
-}
-
-.today-kicker,
-.today-card span {
-  display: block;
-  color: #8f746f;
-  font-size: 0.72rem;
-  font-weight: 850;
-}
-
-.today-card strong {
-  display: block;
-  color: #3a3332;
-  margin: 8px 0;
-  font-size: 0.95rem;
-  line-height: 1.45;
-}
-
-.future-event {
-  width: 236px;
-}
-
-.future-pin {
-  top: calc(214px + var(--lane-offset, 0px));
-  width: 12px;
-  height: 12px;
-  border: 3px solid #b4a47c;
+.timeline-event.future .event-pin {
+  border-color: #b4a47c;
   box-shadow: 0 0 0 7px rgba(180, 164, 124, 0.13);
 }
 
-.future-card {
-  padding: 16px;
+.event-summary {
+  width: 100%;
+  min-height: 106px;
+  max-height: 106px;
+  border: 1px solid rgba(112, 88, 82, 0.1);
+  border-radius: 16px;
+  padding: 13px;
+  text-align: left;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 247, 0.78) 70%, #ffffff);
+  box-shadow: 0 10px 28px rgba(116, 88, 80, 0.06);
+  cursor: pointer;
 }
 
-.future-card .date {
+.event-summary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(116, 88, 80, 0.1);
+}
+
+.event-date,
+.event-note,
+.event-meta em {
+  color: #746f6b;
+  font-size: 0.78rem;
+}
+
+.event-summary strong {
   display: block;
-  color: #90756f;
-  font-size: 0.8rem;
-  font-weight: 850;
-  margin-bottom: 8px;
-}
-
-.future-card h2 {
+  margin: 6px 0;
   color: #302c2c;
-  font-size: 1.05rem;
-  line-height: 1.32;
-  margin-bottom: 8px;
+  font-size: 1rem;
+  line-height: 1.35;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.future-card p {
-  margin: 0;
-  color: #6f6a66;
-  font-size: 0.9rem;
-  line-height: 1.58;
+.event-note {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.metric-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 12px;
+.event-meta {
+  margin-top: 10px;
 }
 
-.metric-row span {
-  color: #7d6a66;
-  background: linear-gradient(135deg, rgba(247, 240, 238, 0.66), rgba(255, 255, 255, 0.94));
+.event-meta em {
   border: 1px solid rgba(129, 104, 98, 0.08);
   border-radius: 999px;
-  padding: 6px 9px;
-  font-size: 0.76rem;
+  padding: 5px 8px;
+  background: linear-gradient(135deg, rgba(247, 240, 238, 0.66), rgba(255, 255, 255, 0.94));
+  font-style: normal;
   font-weight: 750;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 320px;
-  color: var(--text-secondary);
 }
 
 .compact-timeline {
   display: none;
 }
 
-.compact-section,
-.compact-today {
-  position: relative;
-}
-
 .compact-section {
   display: grid;
-  gap: 14px;
-  padding-left: 18px;
-}
-
-.compact-section::before {
-  content: "";
-  position: absolute;
-  left: 5px;
-  top: 34px;
-  bottom: 4px;
-  width: 2px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(201, 154, 165, 0.38), rgba(180, 164, 124, 0.28));
+  gap: 12px;
 }
 
 .compact-section-title {
@@ -852,33 +807,17 @@ onMounted(async () => {
   font-weight: 850;
 }
 
-.compact-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+.compact-card,
+.compact-today {
   border: 1px solid rgba(112, 88, 82, 0.1);
   border-radius: 16px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 246, 0.82));
   box-shadow: 0 8px 22px rgba(116, 88, 80, 0.05);
 }
 
-.compact-dot {
-  position: absolute;
-  left: -19px;
-  top: 20px;
-  width: 10px;
-  height: 10px;
-  border: 3px solid #c99aa5;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 0 6px rgba(201, 154, 165, 0.12);
-}
-
-.compact-card.future .compact-dot {
-  border-color: #b4a47c;
-  box-shadow: 0 0 0 6px rgba(180, 164, 124, 0.13);
+.compact-card {
+  cursor: pointer;
 }
 
 .compact-card strong,
@@ -888,29 +827,21 @@ onMounted(async () => {
 
 .compact-card strong {
   color: #302c2c;
-  font-size: 1rem;
 }
 
-.compact-card span {
-  color: #90756f;
-  font-size: 0.8rem;
-  font-weight: 850;
+.compact-card span,
+.compact-card p {
+  color: #746f6b;
+  font-size: 0.88rem;
 }
 
 .compact-card p {
   margin: 8px 0 0;
-  color: #6f6a66;
-  font-size: 0.9rem;
-  line-height: 1.58;
 }
 
 .compact-today {
-  margin: 18px 0;
-  border: 1px solid rgba(126, 92, 82, 0.12);
-  border-radius: 18px;
-  padding: 14px;
+  margin: 16px 0;
   text-align: center;
-  background: linear-gradient(180deg, #ffffff, rgba(250, 244, 241, 0.86));
 }
 
 .compact-today span,
@@ -925,6 +856,15 @@ onMounted(async () => {
   display: block;
   margin: 6px 0;
   color: #3a3332;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  color: var(--text-secondary);
 }
 
 .loader {
@@ -948,20 +888,21 @@ onMounted(async () => {
     flex-direction: column;
   }
 
+  .filters-panel {
+    grid-template-columns: 1fr;
+  }
+
   .timeline-viewport {
     display: none;
   }
 
   .compact-timeline {
-    display: block;
+    display: grid;
+    gap: 12px;
   }
 }
 
 @media (max-width: 640px) {
-  .timeline-page {
-    max-width: 100%;
-  }
-
   .timeline-shell {
     padding: 16px;
     border-radius: 20px;
@@ -973,10 +914,6 @@ onMounted(async () => {
 
   .timeline-hero h1 {
     font-size: 1.6rem;
-  }
-
-  .summary {
-    justify-content: flex-start;
   }
 }
 </style>
