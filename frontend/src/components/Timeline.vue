@@ -177,6 +177,7 @@ today.setHours(0, 0, 0, 0);
 const laneGap = 118;
 const axisBaseTop = 220;
 const timelineWidth = 1680;
+const axisInset = 140;
 const laneCount = 4;
 const dayMs = 86400000;
 
@@ -312,7 +313,8 @@ const rangeEnd = computed(() => {
 });
 
 const rangeDays = computed(() => Math.max(30, Math.ceil((rangeEnd.value - rangeStart.value) / dayMs)));
-const todayLeft = computed(() => `${dateToPercent(today)}%`);
+const drawableWidth = computed(() => timelineWidth - axisInset * 2);
+const todayLeft = computed(() => `${dateToPixel(today)}px`);
 const rangeStartLabel = computed(() => formatShortDate(rangeStart.value));
 const rangeEndLabel = computed(() => formatShortDate(rangeEnd.value));
 
@@ -326,7 +328,7 @@ const timelineTicks = computed(() => {
       key: `${cursor.getFullYear()}-${cursor.getMonth()}`,
       label: cursor.getMonth() === 0 ? `${cursor.getFullYear()}` : `${cursor.getMonth() + 1}月`,
       major: cursor.getMonth() === 0,
-      left: `${dateToPercent(cursor)}%`
+      left: `${dateToPixel(cursor)}px`
     });
     cursor.setMonth(cursor.getMonth() + 1);
   }
@@ -340,6 +342,10 @@ function categoryLabel(value) {
 
 function dateToPercent(date) {
   return Math.min(100, Math.max(0, ((date - rangeStart.value) / dayMs / rangeDays.value) * 100));
+}
+
+function dateToPixel(date) {
+  return axisInset + (drawableWidth.value * dateToPercent(date)) / 100;
 }
 
 function toAxisItem(item, index, kind) {
@@ -360,7 +366,7 @@ function toAxisItem(item, index, kind) {
 }
 
 const getItemStyle = (item) => ({
-  left: `${dateToPercent(item.axisDate)}%`,
+  left: `${dateToPixel(item.axisDate)}px`,
   top: `${axisBaseTop + item.lane * laneGap}px`
 });
 
@@ -368,7 +374,7 @@ const centerToday = async () => {
   await nextTick();
   const viewport = timelineViewportRef.value;
   if (!viewport) return;
-  viewport.scrollLeft = Math.max(0, (timelineWidth * dateToPercent(today)) / 100 - viewport.clientWidth / 2);
+  viewport.scrollLeft = Math.max(0, dateToPixel(today) - viewport.clientWidth / 2);
 };
 
 const fitAll = async () => {
@@ -656,8 +662,8 @@ onMounted(fetchTimelineData);
 
 .scale-line {
   position: absolute;
-  left: 42px;
-  right: 42px;
+  left: 140px;
+  right: 140px;
   top: 188px;
   height: 2px;
   background: linear-gradient(90deg, rgba(173, 125, 136, 0), rgba(173, 125, 136, 0.28), rgba(128, 148, 134, 0));
@@ -672,11 +678,11 @@ onMounted(fetchTimelineData);
 }
 
 .range-label.start {
-  left: 42px;
+  left: 140px;
 }
 
 .range-label.end {
-  right: 42px;
+  right: 140px;
 }
 
 .range-label.today {
