@@ -18,12 +18,19 @@
           <span class="mode-subtitle">左侧压缩过去，右侧展开即将到来的日子</span>
         </div>
         <div class="summary">
+          <span>{{ timelineEvents.length }} 个时间轴事件</span>
           <span>{{ pastItems.length }} 个过去节点</span>
           <span>{{ futureItems.length }} 个未来提醒</span>
         </div>
       </div>
 
+      <div v-if="timelineEvents.length === 0" class="timeline-empty">
+        <strong>时间轴还没有事件</strong>
+        <span>回到首页事件中心，把需要展示的事件打开“加入时间轴”。</span>
+      </div>
+
       <div
+        v-else
         ref="timelineViewportRef"
         class="timeline-viewport"
         :class="{ dragging }"
@@ -34,7 +41,7 @@
         @pointerleave="stopDrag"
         @wheel.prevent="wheelTimeline"
       >
-        <div class="centered-timeline">
+        <div class="centered-timeline" :style="{ minHeight: timelineHeight }">
           <section class="past-panel">
             <div class="panel-title">已经过去</div>
             <div class="past-ruler">
@@ -52,7 +59,7 @@
                 v-for="item in pastItems"
                 :key="item.key"
                 class="past-event"
-                :style="{ left: getPastLeft(item) }"
+                :style="getPastStyle(item)"
               >
                 <span class="past-pin"></span>
                 <div class="past-card">
@@ -95,8 +102,7 @@
                 v-for="(item, index) in futureItems"
                 :key="item.key"
                 class="future-event"
-                :class="{ lower: index % 2 === 1 }"
-                :style="{ left: getFutureLeft(item) }"
+                :style="getFutureStyle(item)"
               >
                 <span class="future-pin"></span>
                 <div class="future-card">
@@ -118,7 +124,7 @@
         </div>
       </div>
 
-      <div class="compact-timeline">
+      <div v-if="timelineEvents.length > 0" class="compact-timeline">
         <section class="compact-section">
           <div class="compact-section-title">已经过去</div>
           <article v-for="item in pastItems" :key="item.key" class="compact-card past">
@@ -191,9 +197,15 @@ const formatFullDate = (date) => `${date.getFullYear()}年${date.getMonth() + 1}
 
 const todayLabel = computed(() => formatFullDate(today));
 const weekdayLabel = computed(() => today.toLocaleDateString('zh-CN', { weekday: 'long' }));
+const laneGap = 132;
+const rulerTop = 292;
+
+const timelineEvents = computed(() => {
+  return events.value.filter(event => Boolean(event.showInTimeline ?? event.show_in_timeline));
+});
 
 const normalizedItems = computed(() => {
-  return events.value.map((event) => {
+  return timelineEvents.value.map((event) => {
     const originDate = parseDate(event.date);
     const daysUntil = Number(event.daysUntil);
     const hasFuture = event.enableCountdown && Number.isFinite(daysUntil) && daysUntil >= 0;
@@ -232,7 +244,11 @@ const pastItems = computed(() => {
       ...item,
       note: item.story || (item.daysPassed ? `已经过去 ${item.daysPassed} 天` : '已经归入过去的年份里')
     }))
-    .sort((a, b) => a.originDate - b.originDate);
+    .sort((a, b) => a.originDate - b.originDate)
+    .map((item, index) => ({
+      ...item,
+      lane: index % 4
+    }));
 });
 
 const futureItems = computed(() => {
@@ -242,8 +258,19 @@ const futureItems = computed(() => {
       ...item,
       note: Number(item.daysUntil) === 0 ? '今天就是这个日子。' : `距离到来还有 ${item.daysUntil} 天。`
     }))
-    .sort((a, b) => a.targetDate - b.targetDate);
+    .sort((a, b) => a.targetDate - b.targetDate)
+    .map((item, index) => ({
+      ...item,
+      lane: index % 4
+    }));
 });
+
+const maxLane = computed(() => {
+  const lanes = [...pastItems.value, ...futureItems.value].map(item => item.lane || 0);
+  return lanes.length ? Math.max(...lanes) : 0;
+});
+
+const timelineHeight = computed(() => `${Math.max(620, 450 + maxLane.value * laneGap)}px`);
 
 const minPastYear = computed(() => {
   const years = pastItems.value.map(item => item.originDate.getFullYear());
@@ -299,6 +326,18 @@ const getFutureLeft = (item) => {
   const days = Math.max(0, Math.round((item.targetDate - today) / 86400000));
   return `${Math.min(82, Math.max(18, (days / futureDays.value) * 100))}%`;
 };
+
+const getPastStyle = (item) => ({
+  left: getPastLeft(item),
+  top: `${-220 - (item.lane || 0) * laneGap}px`,
+  '--lane-offset': `${(item.lane || 0) * laneGap}px`
+});
+
+const getFutureStyle = (item) => ({
+  left: getFutureLeft(item),
+  top: `${-226 - (item.lane || 0) * laneGap}px`,
+  '--lane-offset': `${(item.lane || 0) * laneGap}px`
+});
 
 const centerToday = async () => {
   await nextTick();
@@ -401,6 +440,21 @@ onMounted(async () => {
   margin-bottom: 18px;
 }
 
+.timeline-empty {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(214, 199, 184, 0.74);
+  border-radius: 18px;
+  padding: 24px;
+  color: #746f6b;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 247, 237, 0.62));
+}
+
+.timeline-empty strong {
+  color: #3a3332;
+  font-size: 1.05rem;
+}
+
 .mode-title,
 .mode-subtitle {
   display: block;
@@ -466,7 +520,6 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: 520px 112px 760px;
   width: 1392px;
-  min-height: 620px;
   border-radius: 24px;
   border: 1px solid rgba(123, 101, 92, 0.1);
   overflow: visible;
@@ -501,7 +554,7 @@ onMounted(async () => {
   position: absolute;
   left: 24px;
   right: 24px;
-  top: 310px;
+  top: 292px;
   height: 2px;
   background: linear-gradient(90deg, rgba(173, 125, 136, 0), rgba(173, 125, 136, 0.32), rgba(191, 162, 132, 0.22));
 }
@@ -567,7 +620,6 @@ onMounted(async () => {
 }
 
 .past-event {
-  top: -230px;
   width: 180px;
 }
 
@@ -581,7 +633,7 @@ onMounted(async () => {
 }
 
 .past-pin {
-  top: 218px;
+  top: calc(208px + var(--lane-offset, 0px));
   width: 11px;
   height: 11px;
   border: 3px solid #c99aa5;
@@ -705,24 +757,15 @@ onMounted(async () => {
 }
 
 .future-event {
-  top: -236px;
   width: 236px;
 }
 
-.future-event.lower {
-  top: 54px;
-}
-
 .future-pin {
-  top: 224px;
+  top: calc(214px + var(--lane-offset, 0px));
   width: 12px;
   height: 12px;
   border: 3px solid #b4a47c;
   box-shadow: 0 0 0 7px rgba(180, 164, 124, 0.13);
-}
-
-.future-event.lower .future-pin {
-  top: -47px;
 }
 
 .future-card {

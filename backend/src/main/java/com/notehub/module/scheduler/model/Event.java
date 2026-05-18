@@ -33,6 +33,10 @@ public class Event {
     private List<String> tags;
     private String color;
     private Boolean pinned;
+
+    @JsonProperty("show_in_timeline")
+    private Boolean showInTimeline;
+
     private String story;
     private String location;
     private String mood;
@@ -132,6 +136,14 @@ public class Event {
 
     public void setPinned(Boolean pinned) {
         this.pinned = pinned;
+    }
+
+    public Boolean getShowInTimeline() {
+        return showInTimeline;
+    }
+
+    public void setShowInTimeline(Boolean showInTimeline) {
+        this.showInTimeline = showInTimeline;
     }
 
     public String getStory() {

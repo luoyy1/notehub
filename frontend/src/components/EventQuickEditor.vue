@@ -56,6 +56,10 @@
         </label>
 
         <div class="toggles-grid">
+          <label class="toggle-label switch-toggle">
+            <input v-model="form.show_in_timeline" type="checkbox" />
+            <span>加入时间轴</span>
+          </label>
           <label class="toggle-label">
             <input v-model="form.pinned" type="checkbox" />
             <span>首页置顶</span>
@@ -137,6 +141,7 @@ function createEmptyForm() {
     tagsText: '',
     color: '#ec4899',
     pinned: false,
+    show_in_timeline: false,
     story: '',
     location: '',
     mood: '',
@@ -173,6 +178,7 @@ const normalizeEvent = (event) => ({
   tagsText: Array.isArray(event?.tags) ? event.tags.join('，') : '',
   color: event?.color || '#ec4899',
   pinned: Boolean(event?.pinned),
+  show_in_timeline: Boolean(event?.show_in_timeline ?? event?.showInTimeline),
   story: event?.story || '',
   location: event?.location || '',
   mood: event?.mood || '',
@@ -196,6 +202,7 @@ const toPayload = () => ({
   tags: splitTags(form.tagsText),
   color: form.color || '#ec4899',
   pinned: Boolean(form.pinned),
+  show_in_timeline: Boolean(form.show_in_timeline),
   story: form.story || '',
   location: form.location || '',
   mood: form.mood || '',
@@ -402,6 +409,60 @@ input[type="checkbox"] {
   font-weight: 700;
 }
 
+.toggle-label {
+  position: relative;
+  min-height: 38px;
+  border: 1px solid rgba(214, 199, 184, 0.74);
+  border-radius: 999px;
+  padding: 6px 12px 6px 42px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 246, 0.72));
+  cursor: pointer;
+}
+
+.toggle-label input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-label::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  width: 24px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.9), rgba(255, 250, 246, 0.82));
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  transition: all 0.18s ease;
+}
+
+.toggle-label::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(31, 41, 55, 0.16);
+  transition: all 0.18s ease;
+}
+
+.toggle-label:has(input:checked) {
+  color: #7c2d12;
+  border-color: rgba(253, 186, 116, 0.42);
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.88), rgba(204, 251, 241, 0.72));
+}
+
+.toggle-label:has(input:checked)::before {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.42), rgba(45, 212, 191, 0.42));
+}
+
+.toggle-label:has(input:checked)::after {
+  transform: translateX(10px);
+}
+
 .notification-settings {
   border-radius: 14px;
   padding: 12px;
@@ -419,6 +480,13 @@ input[type="checkbox"] {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+}
+
+.checkbox-group label {
+  border: 1px solid rgba(214, 199, 184, 0.74);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 250, 246, 0.72));
 }
 
 .error-message {

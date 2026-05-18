@@ -9,10 +9,10 @@ export const getEvents = () => {
   return api.get('/events').then(res => res.data).catch(() => {
     console.warn("Backend not reachable, using mock events data for preview");
     return [
-      { id: "e1-mock", name: "在一起的日子", date: "2024-01-01", isAnnual: false, enableCountUp: true, enableCountdown: false, daysPassed: 862, daysToNextHundred: 38 },
-      { id: "e2-mock", name: "老婆生日", date: "2000-06-15", isAnnual: true, enableCountUp: false, enableCountdown: true, daysUntil: 35, nextAge: 26 },
-      { id: "e3-mock", name: "我的生日", date: "2000-03-20", isAnnual: true, enableCountUp: false, enableCountdown: true, daysUntil: 0, nextAge: 26 },
-      { id: "e4-mock", name: "结婚纪念日", date: "2025-10-01", isAnnual: true, enableCountUp: true, enableCountdown: true, daysPassed: 222, daysToNextHundred: 78, daysUntil: 140 }
+      { id: "e1-mock", name: "在一起的日子", date: "2024-01-01", isAnnual: false, enableCountUp: true, enableCountdown: false, showInTimeline: true, daysPassed: 862, daysToNextHundred: 38 },
+      { id: "e2-mock", name: "老婆生日", date: "2000-06-15", isAnnual: true, enableCountUp: false, enableCountdown: true, showInTimeline: true, daysUntil: 35, nextAge: 26 },
+      { id: "e3-mock", name: "我的生日", date: "2000-03-20", isAnnual: true, enableCountUp: false, enableCountdown: true, showInTimeline: false, daysUntil: 0, nextAge: 26 },
+      { id: "e4-mock", name: "结婚纪念日", date: "2025-10-01", isAnnual: true, enableCountUp: true, enableCountdown: true, showInTimeline: true, daysPassed: 222, daysToNextHundred: 78, daysUntil: 140 }
     ];
   });
 };
@@ -58,10 +58,10 @@ export const saveWishes = (wishes) => {
 export const getRawEvents = () => {
   return api.get('/events/raw').then(res => res.data).catch(() => {
     return [
-      { id: "e1-mock", name: "在一起的日子", date: "2024-01-01", is_annual: false, enable_count_up: true, enable_countdown: false, enable_notification: true, notify_advance_days: [] },
-      { id: "e2-mock", name: "老婆生日", date: "2000-06-15", is_annual: true, enable_count_up: false, enable_countdown: true, enable_notification: true, notify_advance_days: [7, 3, 1, 0] },
-      { id: "e3-mock", name: "我的生日", date: "2000-03-20", is_annual: true, enable_count_up: false, enable_countdown: true, enable_notification: true, notify_advance_days: [7, 3, 1, 0] },
-      { id: "e4-mock", name: "结婚纪念日", date: "2025-10-01", is_annual: true, enable_count_up: true, enable_countdown: true, enable_notification: true, notify_advance_days: [7, 3, 1, 0] }
+      { id: "e1-mock", name: "在一起的日子", date: "2024-01-01", is_annual: false, enable_count_up: true, enable_countdown: false, show_in_timeline: true, enable_notification: true, notify_advance_days: [] },
+      { id: "e2-mock", name: "老婆生日", date: "2000-06-15", is_annual: true, enable_count_up: false, enable_countdown: true, show_in_timeline: true, enable_notification: true, notify_advance_days: [7, 3, 1, 0] },
+      { id: "e3-mock", name: "我的生日", date: "2000-03-20", is_annual: true, enable_count_up: false, enable_countdown: true, show_in_timeline: false, enable_notification: true, notify_advance_days: [7, 3, 1, 0] },
+      { id: "e4-mock", name: "结婚纪念日", date: "2025-10-01", is_annual: true, enable_count_up: true, enable_countdown: true, show_in_timeline: true, enable_notification: true, notify_advance_days: [7, 3, 1, 0] }
     ];
   });
 };

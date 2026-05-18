@@ -57,6 +57,7 @@ public class EventController {
         event.putIfAbsent("tags", Collections.emptyList());
         event.putIfAbsent("color", "#ec4899");
         event.putIfAbsent("pinned", false);
+        event.putIfAbsent("show_in_timeline", false);
         event.putIfAbsent("story", "");
         event.putIfAbsent("location", "");
         event.putIfAbsent("mood", "");
@@ -84,6 +85,7 @@ public class EventController {
             item.put("tags", event.getTags());
             item.put("color", event.getColor());
             item.put("pinned", event.getPinned());
+            item.put("showInTimeline", event.getShowInTimeline());
             item.put("story", event.getStory());
             item.put("location", event.getLocation());
             item.put("mood", event.getMood());
