@@ -265,7 +265,7 @@ const save = async () => {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(72, 61, 50, 0.28);
   backdrop-filter: blur(8px);
 }
 
@@ -275,7 +275,7 @@ const save = async () => {
   overflow-y: auto;
   border-radius: 24px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.96);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 246, 0.92));
 }
 
 .modal-header {
@@ -303,7 +303,7 @@ const save = async () => {
   height: 36px;
   border: 0;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(255, 250, 246, 0.86));
   color: var(--text-secondary);
   cursor: pointer;
   font: inherit;
@@ -346,7 +346,7 @@ const save = async () => {
 .story-field textarea {
   border: 1px solid rgba(31, 41, 55, 0.1);
   border-radius: 10px;
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff, rgba(255, 250, 246, 0.72));
   color: var(--text-primary);
   font: inherit;
   outline: none;
@@ -358,9 +358,24 @@ const save = async () => {
 }
 
 .color-field {
-  width: 100%;
+  width: 58px;
   height: 40px;
-  padding: 4px;
+  padding: 8px;
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.66), rgba(204, 251, 241, 0.58));
+}
+
+.color-field::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-field::-webkit-color-swatch {
+  border: 0;
+  border-radius: 8px;
+  opacity: 0.64;
+}
+
+input[type="checkbox"] {
+  accent-color: #d6a07a;
 }
 
 .story-field textarea {
@@ -374,7 +389,7 @@ const save = async () => {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border-radius: 14px;
   padding: 12px;
-  background: #ffffff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(240, 253, 250, 0.58));
 }
 
 .toggle-label,
@@ -390,7 +405,7 @@ const save = async () => {
 .notification-settings {
   border-radius: 14px;
   padding: 12px;
-  background: #ffffff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 247, 237, 0.68));
 }
 
 .notification-settings p {
@@ -409,7 +424,7 @@ const save = async () => {
 .error-message {
   margin: 0;
   color: #be123c;
-  background: #ffe4e6;
+  background: linear-gradient(135deg, rgba(255, 228, 230, 0.9), rgba(255, 247, 237, 0.78));
   border-radius: 12px;
   padding: 10px 12px;
 }
@@ -432,14 +447,15 @@ const save = async () => {
 }
 
 .btn-secondary {
-  background: #f3f4f6;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.96), rgba(255, 250, 246, 0.82));
   color: var(--text-secondary);
 }
 
 .btn-primary {
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--primary), #f43f5e);
-  box-shadow: 0 8px 22px rgba(236, 72, 153, 0.18);
+  color: #7c2d12;
+  border: 1px solid rgba(253, 186, 116, 0.38);
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.95), rgba(204, 251, 241, 0.82));
+  box-shadow: 0 8px 22px rgba(120, 76, 45, 0.1);
 }
 
 .btn-primary:disabled {

@@ -111,7 +111,7 @@ const getEventsForDay = (day) => {
 <style scoped>
 .calendar-container {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.88);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 246, 0.88));
   border-radius: 18px;
 }
 
@@ -131,7 +131,7 @@ const getEventsForDay = (day) => {
 .year-selector {
   font-weight: 800;
   color: var(--secondary);
-  background: var(--secondary-light);
+  background: linear-gradient(135deg, rgba(204, 251, 241, 0.82), rgba(255, 255, 255, 0.86));
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 0.88rem;
@@ -152,7 +152,7 @@ const getEventsForDay = (day) => {
 
 .month-tab {
   flex: 0 0 auto;
-  background: #f8fafc;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.96), rgba(255, 250, 246, 0.86));
   border: 1px solid #eef2f6;
   padding: 8px 10px;
   border-radius: 10px;
@@ -165,13 +165,13 @@ const getEventsForDay = (day) => {
 }
 
 .month-tab:hover {
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff, rgba(240, 253, 250, 0.8));
 }
 
 .month-tab.active {
-  background: var(--text-primary);
-  color: white;
-  border-color: var(--text-primary);
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.95), rgba(204, 251, 241, 0.82));
+  color: #7c2d12;
+  border-color: rgba(253, 186, 116, 0.38);
 }
 
 .month-dot {
@@ -182,10 +182,10 @@ const getEventsForDay = (day) => {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--primary);
+  background: linear-gradient(135deg, rgba(194, 65, 12, 0.68), rgba(15, 118, 110, 0.52));
 }
 .month-tab.active .month-dot {
-  background: white;
+  background: linear-gradient(135deg, rgba(194, 65, 12, 0.72), rgba(15, 118, 110, 0.6));
 }
 
 .calendar-grid {
@@ -217,7 +217,7 @@ const getEventsForDay = (day) => {
 }
 
 .day-cell:not(.blank):hover {
-  background: #ffffff;
+  background: linear-gradient(135deg, #ffffff, rgba(255, 250, 246, 0.82));
 }
 
 .day-number {
@@ -228,7 +228,7 @@ const getEventsForDay = (day) => {
 }
 
 .today {
-  background: var(--primary-light) !important;
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.82), rgba(255, 255, 255, 0.9)) !important;
   box-shadow: inset 0 0 0 1px rgba(194, 65, 12, 0.22);
 }
 
@@ -238,7 +238,7 @@ const getEventsForDay = (day) => {
 }
 
 .has-event {
-  background: #ffffff;
+  background: linear-gradient(145deg, #ffffff, rgba(255, 250, 246, 0.82));
   box-shadow: 0 5px 14px rgba(31, 41, 55, 0.08);
   cursor: pointer;
 }
@@ -247,7 +247,7 @@ const getEventsForDay = (day) => {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(31, 41, 55, 0.12);
   z-index: 10;
-  background: white;
+  background: linear-gradient(145deg, #ffffff, rgba(240, 253, 250, 0.78));
 }
 
 .event-dots {
@@ -266,7 +266,7 @@ const getEventsForDay = (day) => {
 }
 
 .dot-pink {
-  background: var(--primary);
+  background: linear-gradient(135deg, rgba(194, 65, 12, 0.72), rgba(15, 118, 110, 0.58));
 }
 
 /* Tooltip */
@@ -332,6 +332,6 @@ const getEventsForDay = (day) => {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--primary);
+  background: linear-gradient(135deg, rgba(194, 65, 12, 0.72), rgba(15, 118, 110, 0.58));
 }
 </style>

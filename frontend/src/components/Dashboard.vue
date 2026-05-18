@@ -209,8 +209,8 @@ onMounted(() => {
 }
 
 .settings-btn {
-  background: var(--text-primary);
-  border: 0;
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.9), rgba(204, 251, 241, 0.86));
+  border: 1px solid rgba(214, 199, 184, 0.9);
   border-radius: 999px;
   min-width: 118px;
   height: 42px;
@@ -220,14 +220,14 @@ onMounted(() => {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  color: #ffffff;
+  color: #7c2d12;
   font-weight: 800;
   transition: all 0.2s;
-  box-shadow: 0 10px 24px rgba(31, 41, 51, 0.18);
+  box-shadow: 0 10px 24px rgba(120, 76, 45, 0.11);
 }
 
 .settings-btn:hover {
-  background: #344054;
+  background: linear-gradient(135deg, rgba(254, 215, 170, 0.94), rgba(153, 246, 228, 0.86));
   transform: translateY(-1px);
 }
 

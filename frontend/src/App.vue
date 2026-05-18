@@ -133,14 +133,14 @@ onBeforeUnmount(() => {
 }
 
 .nav-item:hover {
-  background: #f7f2ec;
+  background: linear-gradient(135deg, rgba(255, 250, 245, 0.92), rgba(241, 250, 248, 0.74));
   color: var(--primary);
 }
 
 .nav-item.active {
-  background: var(--text-primary);
-  color: #ffffff;
-  box-shadow: 0 8px 20px rgba(31, 41, 51, 0.16);
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.96), rgba(204, 251, 241, 0.82));
+  color: #7c2d12;
+  box-shadow: 0 8px 20px rgba(120, 76, 45, 0.12);
 }
 
 .nav-icon {

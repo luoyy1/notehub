@@ -90,7 +90,7 @@ const cardStyle = computed(() => ({
   position: relative;
   border-radius: 16px;
   padding: 20px;
-  background: #ffffff;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 246, 0.9));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -98,14 +98,6 @@ const cardStyle = computed(() => ({
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border: 1px solid var(--line);
   overflow: hidden;
-}
-
-.event-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
-  background: var(--event-color);
 }
 
 .event-card:hover {
@@ -129,7 +121,8 @@ const cardStyle = computed(() => ({
 
 .pin {
   color: #9a3412;
-  background: #ffedd5;
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.9), rgba(255, 247, 237, 0.72));
+  border: 1px solid rgba(253, 186, 116, 0.34);
   border-radius: 999px;
   padding: 4px 8px;
   font-size: 0.72rem;
@@ -160,7 +153,7 @@ const cardStyle = computed(() => ({
 .edit-btn {
   border: 1px solid color-mix(in srgb, var(--event-color) 26%, white);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--event-color) 7%, white);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--event-color) 8%, white), rgba(255, 255, 255, 0.88));
   color: var(--event-color);
   cursor: pointer;
   font: inherit;
@@ -170,7 +163,7 @@ const cardStyle = computed(() => ({
 }
 
 .edit-btn:hover {
-  background: color-mix(in srgb, var(--event-color) 14%, white);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--event-color) 14%, white), rgba(255, 252, 248, 0.95));
 }
 
 .meta-row,
@@ -187,7 +180,7 @@ const cardStyle = computed(() => ({
 .meta-row span,
 .tags span {
   color: var(--text-secondary);
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc, #fffaf5);
   border: 1px solid #edf0f3;
   border-radius: 999px;
   padding: 5px 9px;
@@ -199,7 +192,7 @@ const cardStyle = computed(() => ({
   margin: 0;
   color: #475467;
   line-height: 1.65;
-  background: #fff7ed;
+  background: linear-gradient(135deg, rgba(255, 247, 237, 0.86), rgba(255, 255, 255, 0.86));
   border: 1px solid #fed7aa;
   border-radius: 12px;
   padding: 12px 14px;
@@ -218,7 +211,7 @@ const cardStyle = computed(() => ({
   gap: 8px;
   padding: 15px 16px;
   border-radius: 14px;
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff, rgba(255, 250, 246, 0.74));
   overflow: hidden;
   box-shadow: none;
   border: 1px solid #eef2f6;
