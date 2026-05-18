@@ -1,0 +1,27 @@
+# Logs
+*.log
+logs/
+.notehub-dev-pids
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+
+# Backend
+backend/target/
+backend/.apt_generated/
+backend/.apt_generated_tests/
+backend/*.log
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

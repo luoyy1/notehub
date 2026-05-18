@@ -1,0 +1,28 @@
+[
+  {
+    "id": "w1-demo",
+    "title": "一起去海边看日出",
+    "description": "找一个不用赶路的周末，住在离海很近的地方。",
+    "type": "trip",
+    "status": "todo",
+    "priority": 2,
+    "target_date": null,
+    "completed_date": null,
+    "location": "海边",
+    "tags": ["旅行", "约会"],
+    "note": "可以顺手拍一组年度照片。"
+  },
+  {
+    "id": "w2-demo",
+    "title": "准备一个只属于她的小礼物",
+    "description": "不一定贵，但要和最近的生活细节有关。",
+    "type": "gift",
+    "status": "planning",
+    "priority": 1,
+    "target_date": null,
+    "completed_date": null,
+    "location": "",
+    "tags": ["礼物"],
+    "note": "提前记录灵感，别到节日前才开始慌。"
+  }
+]

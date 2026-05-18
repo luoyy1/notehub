@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/",
+    "name": "dashboard",
+    "title": "首页",
+    "component": "Dashboard",
+    "icon": "Home",
+    "sort": 1,
+    "visible": true
+  },
+  {
+    "path": "/timeline",
+    "name": "timeline",
+    "title": "时间轴",
+    "component": "Timeline",
+    "icon": "Waypoints",
+    "sort": 2,
+    "visible": true
+  },
+  {
+    "path": "/ideas",
+    "name": "ideas",
+    "title": "功能规划",
+    "component": "FeatureIdeas",
+    "icon": "Sparkles",
+    "sort": 3,
+    "visible": true
+  },
+  {
+    "path": "/wishes",
+    "name": "wishes",
+    "title": "愿望清单",
+    "component": "Wishes",
+    "icon": "HeartHandshake",
+    "sort": 4,
+    "visible": true
+  }
+]

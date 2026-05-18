@@ -1,0 +1,330 @@
+<template>
+  <div class="calendar-container glass">
+    <div class="calendar-header">
+      <h3 class="title">动态日历</h3>
+      <div class="year-selector">
+        <span>{{ currentYear }} 年</span>
+      </div>
+    </div>
+    
+    <!-- 横向月份导航栏 -->
+    <div class="month-nav">
+      <button 
+        v-for="m in 12" 
+        :key="m" 
+        class="month-tab"
+        :class="{ active: currentMonth === m - 1 }"
+        @click="currentMonth = m - 1"
+      >
+        {{ m }}月
+        <div v-if="hasEventsInMonth(m)" class="month-dot"></div>
+      </button>
+    </div>
+
+    <div class="calendar-grid">
+      <div v-for="day in ['日', '一', '二', '三', '四', '五', '六']" :key="day" class="weekday">
+        {{ day }}
+      </div>
+      
+      <div v-for="blank in blankDays" :key="'blank-' + blank" class="day-cell blank"></div>
+      
+      <div 
+        v-for="day in daysInMonth" 
+        :key="'day-' + day" 
+        class="day-cell"
+        :class="{
+          'today': isToday(day),
+          'has-event': getEventsForDay(day).length > 0
+        }"
+      >
+        <span class="day-number">{{ day }}</span>
+        
+        <!-- 悬停放大的 Tooltip -->
+        <div class="tooltip" v-if="getEventsForDay(day).length > 0">
+          <div v-for="(event, i) in getEventsForDay(day)" :key="i" class="tooltip-event">
+            <span class="tooltip-icon">✨</span>
+            <span class="tooltip-name">{{ event.name }}</span>
+          </div>
+        </div>
+
+        <div class="event-dots" v-if="getEventsForDay(day).length > 0">
+          <div 
+            v-for="(event, index) in getEventsForDay(day)" 
+            :key="index"
+            class="dot dot-pink"
+          ></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="calendar-legend">
+      <div class="legend-item">
+        <div class="dot dot-pink"></div>
+        <span>重要事件</span>
+      </div>
+      <div class="legend-item">
+        <div class="month-dot-demo"></div>
+        <span>包含事件的月份</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+  marks: {
+    type: Array,
+    default: () => []
+  }
+});
+
+const today = new Date();
+const currentYear = ref(today.getFullYear());
+const currentMonth = ref(today.getMonth()); // 0-11
+
+const daysInMonth = computed(() => {
+  return new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
+});
+
+const blankDays = computed(() => {
+  return new Date(currentYear.value, currentMonth.value, 1).getDay();
+});
+
+const isToday = (day) => {
+  return day === today.getDate() && 
+         currentMonth.value === today.getMonth() && 
+         currentYear.value === today.getFullYear();
+};
+
+const hasEventsInMonth = (monthNum) => {
+  return props.marks.some(mark => mark.month === monthNum);
+};
+
+const getEventsForDay = (day) => {
+  const dateStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return props.marks.filter(mark => mark.date === dateStr);
+};
+</script>
+
+<style scoped>
+.calendar-container {
+  padding: 24px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.year-selector {
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+/* 月份导航栏 */
+.month-nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  scrollbar-width: none; /* Firefox */
+}
+.month-nav::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.month-tab {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.month-tab:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.month-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.month-dot {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.month-tab.active .month-dot {
+  background: white;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding-bottom: 8px;
+}
+
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+}
+
+.day-cell:not(.blank):hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.day-number {
+  font-weight: 500;
+  z-index: 2;
+  transition: transform 0.2s;
+}
+
+.today {
+  background: var(--primary-light) !important;
+}
+
+.today .day-number {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.has-event {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  cursor: pointer;
+}
+
+.has-event:hover {
+  transform: scale(1.15);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  z-index: 10;
+  background: white;
+}
+
+.event-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dot-pink {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+.has-event:hover .tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-event {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-legend {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border-top: 1px dashed rgba(0,0,0,0.1);
+  padding-top: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.month-dot-demo {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+</style>

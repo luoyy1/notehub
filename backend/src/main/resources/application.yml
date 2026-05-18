@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: notehub-server
+
+  # SMTP 邮件配置 (QQ邮箱)
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: ${MAIL_USERNAME:your_email@qq.com}
+    password: ${MAIL_PASSWORD:your_auth_code}
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: true
+
+server:
+  port: ${SERVER_PORT:18080}
+
+# 调度配置
+scheduler:
+  cron: ${SCHEDULER_CRON:0 0 9 * * ?}          # 默认每天早上9点
+  notify-email: ${NOTIFY_EMAIL:your_email@qq.com} # 接收提醒的邮箱
+  event-data-path: ${EVENT_DATA_PATH:data/events.json}   # 事件数据文件物理路径
+  route-data-path: ${ROUTE_DATA_PATH:data/routes.json}   # 动态路由配置文件物理路径
+  wish-data-path: ${WISH_DATA_PATH:data/wishes.json}      # 愿望清单数据文件物理路径

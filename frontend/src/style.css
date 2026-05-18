@@ -1,0 +1,82 @@
+:root {
+  --primary: #ec4899;      /* pink-500 */
+  --primary-light: #fce7f3; /* pink-100 */
+  --secondary: #f97316;    /* orange-500 */
+  --secondary-light: #ffedd5; /* orange-100 */
+  --background: #fdf2f8;   /* pink-50 */
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-solid: #ffffff;
+  --text-primary: #1f2937; /* gray-800 */
+  --text-secondary: #6b7280; /* gray-500 */
+  --border-radius: 24px;
+  --card-shadow: 0 8px 32px rgba(236, 72, 153, 0.08);
+  --card-hover-shadow: 0 12px 48px rgba(236, 72, 153, 0.15);
+  
+  --font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background: var(--background);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(330,100%,76%,0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(28,100%,74%,0.15) 0px, transparent 50%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-hover-shadow);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(236, 72, 153, 0.2);
+  border-radius: 4px;
+}
+
+/* Headings */
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
