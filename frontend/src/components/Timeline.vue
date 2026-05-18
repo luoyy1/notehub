@@ -117,6 +117,45 @@
           </section>
         </div>
       </div>
+
+      <div class="compact-timeline">
+        <section class="compact-section">
+          <div class="compact-section-title">已经过去</div>
+          <article v-for="item in pastItems" :key="item.key" class="compact-card past">
+            <span class="compact-dot"></span>
+            <div>
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.year }} · {{ item.monthDay }}</span>
+              <p>{{ item.note }}</p>
+              <div v-if="item.tags?.length" class="timeline-tags">
+                <em v-for="tag in item.tags" :key="tag"># {{ tag }}</em>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="compact-today">
+          <span>TODAY</span>
+          <strong>{{ todayLabel }}</strong>
+          <small>{{ weekdayLabel }}</small>
+        </section>
+
+        <section class="compact-section">
+          <div class="compact-section-title">即将发生</div>
+          <article v-for="item in futureItems" :key="item.key" class="compact-card future">
+            <span class="compact-dot"></span>
+            <div>
+              <span>{{ item.targetLabel }}</span>
+              <strong>{{ item.name }}</strong>
+              <p>{{ item.note }}</p>
+              <p v-if="item.story" class="story-note">{{ item.story }}</p>
+              <div class="metric-row" v-if="item.metrics.length">
+                <span v-for="metric in item.metrics" :key="metric">{{ metric }}</span>
+              </div>
+            </div>
+          </article>
+        </section>
+      </div>
     </section>
   </main>
 </template>
@@ -253,12 +292,12 @@ const getPastLeft = (item) => {
   const yearSpan = Math.max(1, today.getFullYear() - minPastYear.value + 1);
   const yearOffset = item.originDate.getFullYear() - minPastYear.value;
   const monthOffset = item.originDate.getMonth() / 12;
-  return `${Math.min(94, Math.max(5, ((yearOffset + monthOffset) / yearSpan) * 100))}%`;
+  return `${Math.min(80, Math.max(20, ((yearOffset + monthOffset) / yearSpan) * 100))}%`;
 };
 
 const getFutureLeft = (item) => {
   const days = Math.max(0, Math.round((item.targetDate - today) / 86400000));
-  return `${Math.min(96, Math.max(4, (days / futureDays.value) * 100))}%`;
+  return `${Math.min(82, Math.max(18, (days / futureDays.value) * 100))}%`;
 };
 
 const centerToday = async () => {
@@ -399,7 +438,7 @@ onMounted(async () => {
 
 .timeline-viewport {
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   border-radius: 24px;
   cursor: grab;
   scrollbar-width: thin;
@@ -430,7 +469,7 @@ onMounted(async () => {
   min-height: 620px;
   border-radius: 24px;
   border: 1px solid rgba(123, 101, 92, 0.1);
-  overflow: hidden;
+  overflow: visible;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 252, 249, 0.72) 58%, #ffffff),
     repeating-linear-gradient(90deg, rgba(144, 121, 111, 0.04) 0, rgba(144, 121, 111, 0.04) 1px, transparent 1px, transparent 38px);
@@ -440,6 +479,7 @@ onMounted(async () => {
 .future-panel {
   position: relative;
   padding: 26px 24px;
+  overflow: hidden;
 }
 
 .past-panel {
@@ -554,6 +594,12 @@ onMounted(async () => {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 247, 0.78) 70%, #ffffff);
   border: 1px solid rgba(112, 88, 82, 0.1);
   box-shadow: 0 10px 30px rgba(116, 88, 80, 0.06);
+}
+
+.past-card,
+.future-card,
+.compact-card {
+  overflow-wrap: anywhere;
 }
 
 .past-card {
@@ -731,6 +777,113 @@ onMounted(async () => {
   color: var(--text-secondary);
 }
 
+.compact-timeline {
+  display: none;
+}
+
+.compact-section,
+.compact-today {
+  position: relative;
+}
+
+.compact-section {
+  display: grid;
+  gap: 14px;
+  padding-left: 18px;
+}
+
+.compact-section::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 34px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(201, 154, 165, 0.38), rgba(180, 164, 124, 0.28));
+}
+
+.compact-section-title {
+  color: #807773;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.compact-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  border: 1px solid rgba(112, 88, 82, 0.1);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 22px rgba(116, 88, 80, 0.05);
+}
+
+.compact-dot {
+  position: absolute;
+  left: -19px;
+  top: 20px;
+  width: 10px;
+  height: 10px;
+  border: 3px solid #c99aa5;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 6px rgba(201, 154, 165, 0.12);
+}
+
+.compact-card.future .compact-dot {
+  border-color: #b4a47c;
+  box-shadow: 0 0 0 6px rgba(180, 164, 124, 0.13);
+}
+
+.compact-card strong,
+.compact-card span {
+  display: block;
+}
+
+.compact-card strong {
+  color: #302c2c;
+  font-size: 1rem;
+}
+
+.compact-card span {
+  color: #90756f;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.compact-card p {
+  margin: 8px 0 0;
+  color: #6f6a66;
+  font-size: 0.9rem;
+  line-height: 1.58;
+}
+
+.compact-today {
+  margin: 18px 0;
+  border: 1px solid rgba(126, 92, 82, 0.12);
+  border-radius: 18px;
+  padding: 14px;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff, rgba(250, 244, 241, 0.86));
+}
+
+.compact-today span,
+.compact-today small {
+  display: block;
+  color: #8f746f;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.compact-today strong {
+  display: block;
+  margin: 6px 0;
+  color: #3a3332;
+}
+
 .loader {
   border: 4px solid rgba(201, 164, 150, 0.24);
   border-top: 4px solid #b98491;
@@ -752,18 +905,35 @@ onMounted(async () => {
     flex-direction: column;
   }
 
-  .centered-timeline {
-    grid-template-columns: 420px 112px 620px;
-    width: 1152px;
+  .timeline-viewport {
+    display: none;
   }
 
-  .today-anchor {
-    border: 1px solid rgba(126, 92, 82, 0.09);
+  .compact-timeline {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .timeline-page {
+    max-width: 100%;
   }
 
-  .past-panel,
-  .future-panel {
-    min-height: 580px;
+  .timeline-shell {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .timeline-hero {
+    text-align: left;
+  }
+
+  .timeline-hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .summary {
+    justify-content: flex-start;
   }
 }
 </style>
