@@ -87,20 +87,30 @@ const cardStyle = computed(() => ({
 
 <style scoped>
 .event-card {
-  border-radius: 20px;
-  padding: 24px;
+  position: relative;
+  border-radius: 16px;
+  padding: 20px;
   background: #ffffff;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
-  border-top: 4px solid var(--event-color);
+  gap: 14px;
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.event-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--event-color);
 }
 
 .event-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(31, 41, 55, 0.11);
 }
 
 .card-header {
@@ -118,8 +128,8 @@ const cardStyle = computed(() => ({
 }
 
 .pin {
-  color: #be185d;
-  background: #fce7f3;
+  color: #9a3412;
+  background: #ffedd5;
   border-radius: 999px;
   padding: 4px 8px;
   font-size: 0.72rem;
@@ -128,14 +138,14 @@ const cardStyle = computed(() => ({
 
 .event-name {
   margin: 0;
-  font-size: 1.25rem;
-  color: #333;
-  font-weight: 700;
+  font-size: 1.16rem;
+  color: var(--text-primary);
+  font-weight: 850;
 }
 
 .event-date {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text-muted);
   font-family: monospace;
   white-space: nowrap;
 }
@@ -148,9 +158,9 @@ const cardStyle = computed(() => ({
 }
 
 .edit-btn {
-  border: 1px solid rgba(236, 72, 153, 0.16);
+  border: 1px solid color-mix(in srgb, var(--event-color) 26%, white);
   border-radius: 999px;
-  background: #ffffff;
+  background: color-mix(in srgb, var(--event-color) 7%, white);
   color: var(--event-color);
   cursor: pointer;
   font: inherit;
@@ -160,7 +170,7 @@ const cardStyle = computed(() => ({
 }
 
 .edit-btn:hover {
-  background: color-mix(in srgb, var(--event-color) 10%, white);
+  background: color-mix(in srgb, var(--event-color) 14%, white);
 }
 
 .meta-row,
@@ -176,9 +186,9 @@ const cardStyle = computed(() => ({
 
 .meta-row span,
 .tags span {
-  color: #6b7280;
-  background: #f9fafb;
-  border: 1px solid rgba(31, 41, 55, 0.06);
+  color: var(--text-secondary);
+  background: #f8fafc;
+  border: 1px solid #edf0f3;
   border-radius: 999px;
   padding: 5px 9px;
   font-size: 0.78rem;
@@ -187,10 +197,11 @@ const cardStyle = computed(() => ({
 
 .story {
   margin: 0;
-  color: #4b5563;
+  color: #475467;
   line-height: 1.65;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(252, 231, 243, 0.45));
-  border-radius: 14px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
   padding: 12px 14px;
 }
 
@@ -205,12 +216,12 @@ const cardStyle = computed(() => ({
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px 20px;
-  border-radius: 16px;
+  padding: 15px 16px;
+  border-radius: 14px;
   background: #ffffff;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: none;
+  border: 1px solid #eef2f6;
 }
 
 .count-up::after,
@@ -241,8 +252,8 @@ const cardStyle = computed(() => ({
 }
 
 .label {
-  color: #666;
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-weight: 750;
   font-size: 0.95rem;
 }
 
@@ -253,25 +264,25 @@ const cardStyle = computed(() => ({
 }
 
 .number {
-  font-size: 2rem;
+  font-size: 2.12rem;
   font-weight: 800;
   color: var(--event-color);
   line-height: 1;
 }
 
 .highlight {
-  color: #f97316;
+  color: var(--secondary);
 }
 
 .unit {
   font-size: 0.9rem;
-  color: #999;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
 .timer-sub {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text-secondary);
   position: relative;
   z-index: 2;
 }

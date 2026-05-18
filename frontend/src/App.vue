@@ -92,25 +92,31 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .app-shell {
+  width: min(1220px, 100%);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 24px;
 }
 
 .top-nav {
+  position: sticky;
+  top: 16px;
+  z-index: 100;
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
-  padding: 8px;
+  padding: 6px;
   border-radius: 999px;
   display: flex;
   gap: 6px;
   overflow-x: auto;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .nav-item {
-  min-width: 92px;
-  height: 40px;
+  min-width: 96px;
+  height: 38px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -127,14 +133,14 @@ onBeforeUnmount(() => {
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: #f7f2ec;
   color: var(--primary);
 }
 
 .nav-item.active {
-  background: #ffffff;
-  color: var(--primary);
-  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.12);
+  background: var(--text-primary);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(31, 41, 51, 0.16);
 }
 
 .nav-icon {
@@ -145,12 +151,14 @@ onBeforeUnmount(() => {
 
 @media (max-width: 640px) {
   .top-nav {
+    top: 8px;
     width: 100%;
     justify-content: flex-start;
+    border-radius: 18px;
   }
 
   .nav-item {
-    min-width: 84px;
+    min-width: 86px;
   }
 }
 </style>

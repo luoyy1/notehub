@@ -110,7 +110,9 @@ const getEventsForDay = (day) => {
 
 <style scoped>
 .calendar-container {
-  padding: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 18px;
 }
 
 .calendar-header {
@@ -121,23 +123,24 @@ const getEventsForDay = (day) => {
 }
 
 .title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: var(--text-primary);
   margin: 0;
 }
 
 .year-selector {
-  font-weight: 600;
-  color: var(--primary);
-  background: var(--primary-light);
-  padding: 6px 16px;
-  border-radius: 20px;
+  font-weight: 800;
+  color: var(--secondary);
+  background: var(--secondary-light);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.88rem;
 }
 
 /* 月份导航栏 */
 .month-nav {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   padding-bottom: 12px;
   margin-bottom: 16px;
@@ -149,12 +152,12 @@ const getEventsForDay = (day) => {
 
 .month-tab {
   flex: 0 0 auto;
-  background: transparent;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  background: #f8fafc;
+  border: 1px solid #eef2f6;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 750;
   color: var(--text-secondary);
   cursor: pointer;
   position: relative;
@@ -162,12 +165,13 @@ const getEventsForDay = (day) => {
 }
 
 .month-tab:hover {
-  background: rgba(0,0,0,0.03);
+  background: #ffffff;
 }
 
 .month-tab.active {
-  background: var(--primary);
+  background: var(--text-primary);
   color: white;
+  border-color: var(--text-primary);
 }
 
 .month-dot {
@@ -187,15 +191,15 @@ const getEventsForDay = (day) => {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 20px;
 }
 
 .weekday {
   text-align: center;
-  font-weight: 600;
+  font-weight: 800;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   padding-bottom: 8px;
 }
 
@@ -205,24 +209,27 @@ const getEventsForDay = (day) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  min-height: 38px;
+  border-radius: 10px;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
 }
 
 .day-cell:not(.blank):hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: #ffffff;
 }
 
 .day-number {
-  font-weight: 500;
+  color: var(--text-secondary);
+  font-weight: 700;
   z-index: 2;
   transition: transform 0.2s;
 }
 
 .today {
   background: var(--primary-light) !important;
+  box-shadow: inset 0 0 0 1px rgba(194, 65, 12, 0.22);
 }
 
 .today .day-number {
@@ -232,13 +239,13 @@ const getEventsForDay = (day) => {
 
 .has-event {
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 5px 14px rgba(31, 41, 55, 0.08);
   cursor: pointer;
 }
 
 .has-event:hover {
-  transform: scale(1.15);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(31, 41, 55, 0.12);
   z-index: 10;
   background: white;
 }
@@ -259,7 +266,7 @@ const getEventsForDay = (day) => {
 }
 
 .dot-pink {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: var(--primary);
 }
 
 /* Tooltip */
@@ -311,7 +318,7 @@ const getEventsForDay = (day) => {
   justify-content: flex-end;
   font-size: 0.85rem;
   color: var(--text-secondary);
-  border-top: 1px dashed rgba(0,0,0,0.1);
+  border-top: 1px solid var(--line);
   padding-top: 16px;
 }
 

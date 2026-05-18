@@ -2,12 +2,16 @@
   <div class="dashboard">
     <header class="header">
       <div class="header-content">
-        <h1>NoteHub</h1>
+        <div>
+          <p class="kicker">Daily memory system</p>
+          <h1>NoteHub</h1>
+        </div>
         <button class="settings-btn" @click="isEditorOpen = true" title="设置日期">
           <SettingsIcon class="icon" />
+          <span>设置日期</span>
         </button>
       </div>
-      <p class="subtitle">记录我们的小时光</p>
+      <p class="subtitle">记录我们的小时间，把重要日子放在看得见的位置。</p>
     </header>
 
     <main v-if="loading" class="loading-state">
@@ -175,55 +179,91 @@ onMounted(() => {
 
 <style scoped>
 .dashboard {
-  max-width: 1200px;
   margin: 0 auto;
 }
 
 .header {
-  margin-bottom: 48px;
-  animation: fadeInDown 0.8s ease-out;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 10px 0 28px;
 }
 
 .header-content {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  padding: 24px 28px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 237, 0.84)),
+    linear-gradient(90deg, rgba(194, 65, 12, 0.08), rgba(15, 118, 110, 0.05));
+  box-shadow: 0 16px 45px rgba(31, 41, 55, 0.08);
+}
+
+.kicker {
+  margin: 0 0 8px;
+  color: var(--secondary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .settings-btn {
-  background: var(--surface);
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  background: var(--text-primary);
+  border: 0;
+  border-radius: 999px;
+  min-width: 118px;
+  height: 42px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: #ffffff;
+  font-weight: 800;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 24px rgba(31, 41, 51, 0.18);
 }
 
 .settings-btn:hover {
-  color: var(--primary);
-  transform: rotate(30deg);
+  background: #344054;
+  transform: translateY(-1px);
+}
+
+.icon {
+  width: 17px;
+  height: 17px;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1.1rem;
-  margin-top: 8px;
-  letter-spacing: 0.1em;
+  font-size: 1rem;
+  margin: 12px 0 0;
+  max-width: 520px;
+  line-height: 1.7;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 32px;
+  grid-template-columns: minmax(0, 1.65fr) minmax(320px, 0.95fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.events-section {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 12px 34px rgba(31, 41, 55, 0.05);
+}
+
+.calendar-section {
+  min-width: 0;
+  position: sticky;
+  top: 94px;
 }
 
 .section-heading {
@@ -235,7 +275,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: var(--text-primary);
 }
 
@@ -254,16 +294,17 @@ onMounted(() => {
 .search-input,
 .category-select {
   height: 40px;
-  border: 1px solid rgba(31, 41, 55, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
   color: var(--text-primary);
   font: inherit;
   outline: none;
+  box-shadow: 0 1px 2px rgba(31, 41, 55, 0.03);
 }
 
 .search-input {
-  width: 220px;
+  width: 230px;
   padding: 0 14px;
 }
 
@@ -274,15 +315,16 @@ onMounted(() => {
 .quick-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 22px;
 }
 
 .stat-card {
-  border: 1px solid rgba(236, 72, 153, 0.08);
-  border-radius: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 20px rgba(31, 41, 55, 0.04);
 }
 
 .stat-card strong,
@@ -292,7 +334,7 @@ onMounted(() => {
 
 .stat-card strong {
   color: var(--primary);
-  font-size: 1.45rem;
+  font-size: 1.38rem;
 }
 
 .stat-card span {
@@ -304,7 +346,7 @@ onMounted(() => {
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  gap: 16px;
 }
 
 .empty-results {
@@ -335,13 +377,16 @@ onMounted(() => {
 }
 
 .animate-in {
-  opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 1;
 }
 
 @media (max-width: 900px) {
   .content-grid {
     grid-template-columns: 1fr;
+  }
+
+  .calendar-section {
+    position: static;
   }
 
   .section-heading {
@@ -364,30 +409,25 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 640px) {
+  .header {
+    margin-top: 4px;
+  }
+
+  .header-content {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .settings-btn {
+    width: 100%;
+  }
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 </style>
