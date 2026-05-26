@@ -1,5 +1,11 @@
 <template>
   <div class="app-shell">
+    <div class="ambient-particles">
+      <div id="stars"></div>
+      <div id="stars2"></div>
+      <div id="stars3"></div>
+    </div>
+
     <nav class="top-nav glass">
       <button
         v-for="route in visibleRoutes"
@@ -111,7 +117,11 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(112, 87, 74, 0.05);
 }
 
 .nav-item {
@@ -122,25 +132,26 @@ onBeforeUnmount(() => {
   background: transparent;
   color: var(--text-secondary);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
   white-space: nowrap;
 }
 
 .nav-item:hover {
-  background: linear-gradient(135deg, rgba(255, 250, 245, 0.92), rgba(241, 250, 248, 0.74));
+  background: rgba(255, 255, 255, 0.5);
   color: var(--primary);
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(255, 237, 213, 0.96), rgba(204, 251, 241, 0.82));
-  color: #7c2d12;
-  box-shadow: 0 8px 20px rgba(120, 76, 45, 0.12);
+  background: #ffffff;
+  color: var(--primary);
+  font-weight: 750;
+  box-shadow: 0 4px 12px rgba(112, 87, 74, 0.08);
 }
 
 .nav-icon {
