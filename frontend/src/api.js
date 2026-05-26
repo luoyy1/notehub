@@ -5,6 +5,15 @@ const api = axios.create({
   timeout: 10000
 });
 
+// Artificial delay to showcase loading animations
+api.interceptors.response.use(async (response) => {
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return response;
+}, async (error) => {
+  await new Promise(resolve => setTimeout(resolve, 800));
+  return Promise.reject(error);
+});
+
 export const getEvents = () => {
   return api.get('/events').then(res => res.data).catch(() => {
     console.warn("Backend not reachable, using mock events data for preview");
