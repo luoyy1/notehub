@@ -230,9 +230,9 @@ onMounted(async () => {
 
 .primary-action {
   color: #ffffff;
-  background: linear-gradient(135deg, var(--primary), #f43f5e);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   padding: 12px 18px;
-  box-shadow: 0 8px 22px rgba(236, 72, 153, 0.18);
+  box-shadow: 0 8px 22px rgba(161, 120, 113, 0.22);
   white-space: nowrap;
 }
 
@@ -249,7 +249,7 @@ onMounted(async () => {
 
 .column {
   background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(161, 120, 113, 0.12);
   border-radius: 20px;
   padding: 16px;
   min-height: 420px;
@@ -282,7 +282,7 @@ onMounted(async () => {
   border: 1px solid rgba(31, 41, 55, 0.06);
   border-radius: 16px;
   padding: 14px;
-  box-shadow: 0 8px 22px rgba(236, 72, 153, 0.06);
+  box-shadow: 0 8px 22px rgba(161, 120, 113, 0.08);
   margin-bottom: 12px;
 }
 
@@ -297,8 +297,8 @@ onMounted(async () => {
 }
 
 .ghost-btn {
-  color: #be123c;
-  background: #ffe4e6;
+  color: #a73a52;
+  background: #f7ebec;
   padding: 7px 10px;
 }
 
@@ -319,7 +319,7 @@ onMounted(async () => {
 
 .title-input {
   border: 0;
-  border-bottom: 2px solid rgba(236, 72, 153, 0.18);
+  border-bottom: 2px solid rgba(161, 120, 113, 0.3);
   border-radius: 0;
   font-size: 1.05rem;
   font-weight: 800;
@@ -368,8 +368,8 @@ onMounted(async () => {
 }
 
 .tag-row span {
-  color: #8b5cf6;
-  background: #f5f3ff;
+  color: var(--secondary);
+  background: var(--secondary-light);
   border-radius: 999px;
   padding: 5px 8px;
   font-size: 0.76rem;
@@ -395,8 +395,8 @@ onMounted(async () => {
   padding: 14px 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(236, 72, 153, 0.1);
-  box-shadow: 0 12px 30px rgba(236, 72, 153, 0.12);
+  border: 1px solid rgba(161, 120, 113, 0.15);
+  box-shadow: 0 12px 30px rgba(161, 120, 113, 0.1);
   color: var(--text-secondary);
   font-weight: 700;
 }
@@ -410,16 +410,6 @@ onMounted(async () => {
   color: var(--text-secondary);
 }
 
-.loader {
-  border: 4px solid var(--primary-light);
-  border-top: 4px solid var(--primary);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
 @media (max-width: 980px) {
   .board {
     grid-template-columns: 1fr;
@@ -430,10 +420,5 @@ onMounted(async () => {
     align-items: stretch;
     flex-direction: column;
   }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 </style>

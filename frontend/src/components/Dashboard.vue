@@ -11,7 +11,6 @@
           <span>设置日期</span>
         </button>
       </div>
-      <p class="subtitle">记录我们的小时间，把重要日子放在看得见的位置。</p>
     </header>
 
     <main v-if="loading" class="loading-state">
@@ -24,7 +23,6 @@
         <div class="section-heading">
           <div>
             <h2 class="section-title">重要日子</h2>
-            <p class="section-subtitle">{{ filteredEvents.length }} 个记录正在陪我们往前走</p>
           </div>
           <div class="filters">
             <input v-model="keyword" class="search-input" type="search" placeholder="搜索名字、标签、故事" />
@@ -56,7 +54,7 @@
         </div>
 
         <div v-if="filteredEvents.length === 0" class="empty-results">
-          没有匹配的记录，换个关键词试试。
+          没有记录，点击右上角“设置日期”添加。
         </div>
       </div>
 
@@ -192,12 +190,12 @@ onMounted(() => {
   align-items: center;
   gap: 20px;
   padding: 24px 28px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 247, 237, 0.84)),
-    linear-gradient(90deg, rgba(194, 65, 12, 0.08), rgba(15, 118, 110, 0.05));
-  box-shadow: 0 16px 45px rgba(31, 41, 55, 0.08);
+  border-radius: 24px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 12px 32px rgba(112, 87, 74, 0.05);
 }
 
 .kicker {
@@ -209,8 +207,8 @@ onMounted(() => {
 }
 
 .settings-btn {
-  background: linear-gradient(135deg, rgba(255, 237, 213, 0.9), rgba(204, 251, 241, 0.86));
-  border: 1px solid rgba(214, 199, 184, 0.9);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 999px;
   min-width: 118px;
   height: 42px;
@@ -220,15 +218,17 @@ onMounted(() => {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  color: #7c2d12;
-  font-weight: 800;
-  transition: all 0.2s;
-  box-shadow: 0 10px 24px rgba(120, 76, 45, 0.11);
+  color: var(--text-primary);
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(112, 87, 74, 0.06);
 }
 
 .settings-btn:hover {
-  background: linear-gradient(135deg, rgba(254, 215, 170, 0.94), rgba(153, 246, 228, 0.86));
-  transform: translateY(-1px);
+  background: #ffffff;
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(112, 87, 74, 0.1);
 }
 
 .icon {
@@ -366,19 +366,7 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.loader {
-  border: 4px solid var(--primary-light);
-  border-top: 4px solid var(--primary);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
 
-.animate-in {
-  opacity: 1;
-}
 
 @media (max-width: 900px) {
   .content-grid {

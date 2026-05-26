@@ -88,21 +88,23 @@ const cardStyle = computed(() => ({
 <style scoped>
 .event-card {
   position: relative;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 246, 0.9));
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.6);
   overflow: hidden;
 }
 
 .event-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 18px 40px rgba(31, 41, 55, 0.11);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .card-header {
@@ -180,20 +182,20 @@ const cardStyle = computed(() => ({
 .meta-row span,
 .tags span {
   color: var(--text-secondary);
-  background: linear-gradient(135deg, #f8fafc, #fffaf5);
-  border: 1px solid #edf0f3;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 999px;
   padding: 5px 9px;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .story {
   margin: 0;
-  color: #475467;
+  color: var(--text-secondary);
   line-height: 1.65;
-  background: linear-gradient(135deg, rgba(255, 247, 237, 0.86), rgba(255, 255, 255, 0.86));
-  border: 1px solid #fed7aa;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   padding: 12px 14px;
 }
@@ -211,29 +213,10 @@ const cardStyle = computed(() => ({
   gap: 8px;
   padding: 15px 16px;
   border-radius: 14px;
-  background: linear-gradient(180deg, #ffffff, rgba(255, 250, 246, 0.74));
+  background: rgba(255, 255, 255, 0.4);
   overflow: hidden;
   box-shadow: none;
-  border: 1px solid #eef2f6;
-}
-
-.count-up::after,
-.countdown::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 40px;
-  pointer-events: none;
-}
-
-.count-up::after {
-  background: linear-gradient(to top, color-mix(in srgb, var(--event-color) 12%, transparent), rgba(255, 255, 255, 0));
-}
-
-.countdown::after {
-  background: linear-gradient(to top, rgba(249, 115, 22, 0.08), rgba(255, 255, 255, 0));
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .timer-main {

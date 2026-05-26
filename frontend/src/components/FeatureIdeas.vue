@@ -148,10 +148,10 @@ const roadmap = [
 
 .release-card {
   background: #ffffff;
-  border: 1px solid rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(161, 120, 113, 0.12);
   border-radius: 18px;
   padding: 18px;
-  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.06);
+  box-shadow: 0 8px 24px rgba(161, 120, 113, 0.06);
 }
 
 .release-card span {
@@ -192,8 +192,8 @@ const roadmap = [
 }
 
 .stage {
-  color: #be185d;
-  background: #fce7f3;
+  color: var(--primary);
+  background: var(--primary-light);
   border-radius: 999px;
   padding: 4px 8px;
   font-size: 0.74rem;

@@ -1,9 +1,7 @@
 <template>
   <main class="timeline-page">
     <section class="timeline-hero">
-      <p class="eyebrow">时间轴</p>
-      <h1>以今天为中心的事件视图</h1>
-      <p class="intro">只展示事件中心勾选加入时间轴的事件，适合快速筛选、定位和维护。</p>
+      <h1>时间轴</h1>
     </section>
 
     <section v-if="loading" class="loading-state">
@@ -462,9 +460,7 @@ onMounted(fetchTimelineData);
 .timeline-hero h1 {
   font-size: 2.05rem;
   line-height: 1.2;
-  background: linear-gradient(135deg, #8d666b 0%, #b08472 58%, #75877b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary);
 }
 
 .intro {
@@ -477,9 +473,11 @@ onMounted(fetchTimelineData);
 .timeline-shell {
   border-radius: 24px;
   padding: 22px;
-  background: linear-gradient(180deg, rgba(255, 250, 248, 0.94), rgba(255, 255, 255, 0.98) 46%, #ffffff);
-  border: 1px solid rgba(120, 98, 90, 0.1);
-  box-shadow: 0 18px 48px rgba(112, 87, 74, 0.07);
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 12px 32px rgba(112, 87, 74, 0.05);
 }
 
 .timeline-toolbar,
@@ -653,11 +651,9 @@ onMounted(fetchTimelineData);
 .scale-strip {
   position: relative;
   height: 710px;
-  border: 1px solid rgba(123, 101, 92, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 252, 249, 0.78) 58%, #ffffff),
-    repeating-linear-gradient(90deg, rgba(144, 121, 111, 0.04) 0, rgba(144, 121, 111, 0.04) 1px, transparent 1px, transparent 42px);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .scale-line {
@@ -665,8 +661,8 @@ onMounted(fetchTimelineData);
   left: 140px;
   right: 140px;
   top: 188px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(173, 125, 136, 0), rgba(173, 125, 136, 0.28), rgba(128, 148, 134, 0));
+  height: 1px;
+  background: var(--line);
 }
 
 .range-label {
@@ -873,20 +869,7 @@ onMounted(fetchTimelineData);
   color: var(--text-secondary);
 }
 
-.loader {
-  border: 4px solid rgba(201, 164, 150, 0.24);
-  border-top: 4px solid #b98491;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
 @media (max-width: 860px) {
   .timeline-toolbar {
